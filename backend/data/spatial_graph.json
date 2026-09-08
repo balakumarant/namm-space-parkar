@@ -1,0 +1,129 @@
+{
+  "nodes": [
+    { "id": "n_f1_entrance", "name": "Main South Entrance", "floor": 1, "type": "entrance", "x": 0.0, "y": 0.5, "z": 24.0, "accessible": true },
+    { "id": "n_f1_c_south", "name": "F1 Corridor South", "floor": 1, "type": "corridor", "x": 0.0, "y": 0.5, "z": 18.0, "accessible": true },
+    { "id": "n_f1_c_r103", "name": "F1 Corridor near Room 103", "floor": 1, "type": "corridor", "x": 0.0, "y": 0.5, "z": 12.0, "accessible": true },
+    { "id": "n_f1_r103_door", "name": "Room 103 Doorway", "floor": 1, "type": "room_door", "x": -2.3, "y": 0.5, "z": 12.0, "accessible": true },
+    { "id": "n_f1_r103_inside", "name": "Room 103 - Admin & Registration", "floor": 1, "type": "room_inside", "x": -7.0, "y": 0.5, "z": 12.0, "accessible": true },
+
+    { "id": "n_f1_c_elev", "name": "F1 Corridor near Elevator A", "floor": 1, "type": "corridor", "x": 0.0, "y": 0.5, "z": 2.0, "accessible": true },
+    { "id": "n_f1_elev_lobby", "name": "F1 Elevator A Lobby", "floor": 1, "type": "elevator_lobby", "x": 3.2, "y": 0.5, "z": 2.0, "accessible": true },
+    { "id": "n_f1_elev_car", "name": "Elevator A (Floor 1)", "floor": 1, "type": "elevator_car", "x": 5.5, "y": 0.5, "z": 2.0, "accessible": true },
+
+    { "id": "n_f1_c_r102", "name": "F1 Corridor near Room 102", "floor": 1, "type": "corridor", "x": 0.0, "y": 0.5, "z": -1.0, "accessible": true },
+    { "id": "n_f1_r102_door", "name": "Room 102 Doorway", "floor": 1, "type": "room_door", "x": -2.3, "y": 0.5, "z": -1.0, "accessible": true },
+    { "id": "n_f1_r102_inside", "name": "Room 102 - IoT Hardware Studio", "floor": 1, "type": "room_inside", "x": -7.0, "y": 0.5, "z": -1.0, "accessible": true },
+
+    { "id": "n_f1_c_mid", "name": "F1 Corridor Mid-North", "floor": 1, "type": "corridor", "x": 0.0, "y": 0.5, "z": -8.0, "accessible": true },
+    { "id": "n_f1_c_r101", "name": "F1 Corridor near Room 101", "floor": 1, "type": "corridor", "x": 0.0, "y": 0.5, "z": -14.0, "accessible": true },
+    { "id": "n_f1_r101_door", "name": "Room 101 Doorway", "floor": 1, "type": "room_door", "x": -2.3, "y": 0.5, "z": -14.0, "accessible": true },
+    { "id": "n_f1_r101_inside", "name": "Room 101 - Techfest Robotics Lab", "floor": 1, "type": "room_inside", "x": -7.0, "y": 0.5, "z": -14.0, "accessible": true },
+
+    { "id": "n_f1_c_stair", "name": "F1 Corridor near Staircase A", "floor": 1, "type": "corridor", "x": 0.0, "y": 0.5, "z": -16.5, "accessible": true },
+    { "id": "n_f1_stair_bottom", "name": "Staircase A Bottom (F1)", "floor": 1, "type": "stair_landing", "x": 5.5, "y": 0.5, "z": -16.5, "accessible": false },
+    { "id": "n_f1_c_north", "name": "F1 Corridor North End", "floor": 1, "type": "corridor", "x": 0.0, "y": 0.5, "z": -22.0, "accessible": true },
+
+    { "id": "n_f2_c_south", "name": "F2 Corridor South", "floor": 2, "type": "corridor", "x": 0.0, "y": 5.0, "z": 18.0, "accessible": true },
+    { "id": "n_f2_c_r203", "name": "F2 Corridor near Room 203", "floor": 2, "type": "corridor", "x": 0.0, "y": 5.0, "z": 12.0, "accessible": true },
+    { "id": "n_f2_r203_door", "name": "Room 203 Doorway", "floor": 2, "type": "room_door", "x": -2.3, "y": 5.0, "z": 12.0, "accessible": true },
+    { "id": "n_f2_r203_inside", "name": "Room 203 - Cyber Security Arena", "floor": 2, "type": "room_inside", "x": -7.0, "y": 5.0, "z": 12.0, "accessible": true },
+
+    { "id": "n_f2_c_elev", "name": "F2 Corridor near Elevator A", "floor": 2, "type": "corridor", "x": 0.0, "y": 5.0, "z": 2.0, "accessible": true },
+    { "id": "n_f2_elev_lobby", "name": "F2 Elevator A Lobby", "floor": 2, "type": "elevator_lobby", "x": 3.2, "y": 5.0, "z": 2.0, "accessible": true },
+    { "id": "n_f2_elev_car", "name": "Elevator A (Floor 2)", "floor": 2, "type": "elevator_car", "x": 5.5, "y": 5.0, "z": 2.0, "accessible": true },
+
+    { "id": "n_f2_c_r202", "name": "F2 Corridor near Room 202", "floor": 2, "type": "corridor", "x": 0.0, "y": 5.0, "z": -1.0, "accessible": true },
+    { "id": "n_f2_r202_door", "name": "Room 202 Doorway", "floor": 2, "type": "room_door", "x": -2.3, "y": 5.0, "z": -1.0, "accessible": true },
+    { "id": "n_f2_r202_inside", "name": "Room 202 - Seminar Hall", "floor": 2, "type": "room_inside", "x": -7.0, "y": 5.0, "z": -1.0, "accessible": true },
+
+    { "id": "n_f2_c_mid", "name": "F2 Corridor Mid-North", "floor": 2, "type": "corridor", "x": 0.0, "y": 5.0, "z": -7.5, "accessible": true },
+    { "id": "n_f2_stair_top", "name": "Staircase A Landing F2 (Top of F1 Flight)", "floor": 2, "type": "stair_landing", "x": 5.5, "y": 5.0, "z": -7.5, "accessible": false },
+    { "id": "n_f2_c_r201", "name": "F2 Corridor near Room 201", "floor": 2, "type": "corridor", "x": 0.0, "y": 5.0, "z": -14.0, "accessible": true },
+    { "id": "n_f2_r201_door", "name": "Room 201 Doorway", "floor": 2, "type": "room_door", "x": -2.3, "y": 5.0, "z": -14.0, "accessible": true },
+    { "id": "n_f2_r201_inside", "name": "Room 201 - AI & Data Science Center", "floor": 2, "type": "room_inside", "x": -7.0, "y": 5.0, "z": -14.0, "accessible": true },
+
+    { "id": "n_f2_c_stair", "name": "F2 Corridor near Staircase A (Upward to F3)", "floor": 2, "type": "corridor", "x": 0.0, "y": 5.0, "z": -16.5, "accessible": true },
+    { "id": "n_f2_stair_bottom", "name": "Staircase A Bottom (F2 flight to F3)", "floor": 2, "type": "stair_landing", "x": 5.5, "y": 5.0, "z": -16.5, "accessible": false },
+    { "id": "n_f2_c_north", "name": "F2 Corridor North End", "floor": 2, "type": "corridor", "x": 0.0, "y": 5.0, "z": -22.0, "accessible": true },
+
+    { "id": "n_f3_c_south", "name": "F3 Corridor South", "floor": 3, "type": "corridor", "x": 0.0, "y": 9.5, "z": 18.0, "accessible": true },
+    { "id": "n_f3_c_r303", "name": "F3 Corridor near Room 303", "floor": 3, "type": "corridor", "x": 0.0, "y": 9.5, "z": 12.0, "accessible": true },
+    { "id": "n_f3_r303_door", "name": "Room 303 Doorway", "floor": 3, "type": "room_door", "x": -2.3, "y": 9.5, "z": 12.0, "accessible": true },
+    { "id": "n_f3_r303_inside", "name": "Room 303 - Dean & Faculty Lounge", "floor": 3, "type": "room_inside", "x": -7.0, "y": 9.5, "z": 12.0, "accessible": true },
+
+    { "id": "n_f3_c_elev", "name": "F3 Corridor near Elevator A", "floor": 3, "type": "corridor", "x": 0.0, "y": 9.5, "z": 2.0, "accessible": true },
+    { "id": "n_f3_elev_lobby", "name": "F3 Elevator A Lobby", "floor": 3, "type": "elevator_lobby", "x": 3.2, "y": 9.5, "z": 2.0, "accessible": true },
+    { "id": "n_f3_elev_car", "name": "Elevator A (Floor 3)", "floor": 3, "type": "elevator_car", "x": 5.5, "y": 9.5, "z": 2.0, "accessible": true },
+
+    { "id": "n_f3_c_r302", "name": "F3 Corridor near Room 302", "floor": 3, "type": "corridor", "x": 0.0, "y": 9.5, "z": -1.0, "accessible": true },
+    { "id": "n_f3_r302_door", "name": "Room 302 Doorway", "floor": 3, "type": "room_door", "x": -2.3, "y": 9.5, "z": -1.0, "accessible": true },
+    { "id": "n_f3_r302_inside", "name": "Room 302 - Executive Board Room", "floor": 3, "type": "room_inside", "x": -7.0, "y": 9.5, "z": -1.0, "accessible": true },
+
+    { "id": "n_f3_c_mid", "name": "F3 Corridor Mid-North", "floor": 3, "type": "corridor", "x": 0.0, "y": 9.5, "z": -7.5, "accessible": true },
+    { "id": "n_f3_stair_top", "name": "Staircase A Top (F3 Landing)", "floor": 3, "type": "stair_landing", "x": 5.5, "y": 9.5, "z": -7.5, "accessible": false },
+    { "id": "n_f3_c_r301", "name": "F3 Corridor near Room 301", "floor": 3, "type": "corridor", "x": 0.0, "y": 9.5, "z": -14.0, "accessible": true },
+    { "id": "n_f3_r301_door", "name": "Room 301 Doorway", "floor": 3, "type": "room_door", "x": -2.3, "y": 9.5, "z": -14.0, "accessible": true },
+    { "id": "n_f3_r301_inside", "name": "Room 301 - Innovation Incubation Cell", "floor": 3, "type": "room_inside", "x": -7.0, "y": 9.5, "z": -14.0, "accessible": true },
+    { "id": "n_f3_c_north", "name": "F3 Corridor North End", "floor": 3, "type": "corridor", "x": 0.0, "y": 9.5, "z": -22.0, "accessible": true }
+  ],
+  "edges": [
+    { "from": "n_f1_entrance", "to": "n_f1_c_south", "weight": 6.0, "type": "flat", "accessible": true },
+    { "from": "n_f1_c_south", "to": "n_f1_c_r103", "weight": 6.0, "type": "flat", "accessible": true },
+    { "from": "n_f1_c_r103", "to": "n_f1_r103_door", "weight": 2.3, "type": "flat", "accessible": true },
+    { "from": "n_f1_r103_door", "to": "n_f1_r103_inside", "weight": 4.7, "type": "flat", "accessible": true },
+    { "from": "n_f1_c_r103", "to": "n_f1_c_elev", "weight": 10.0, "type": "flat", "accessible": true },
+    { "from": "n_f1_c_elev", "to": "n_f1_elev_lobby", "weight": 3.2, "type": "flat", "accessible": true },
+    { "from": "n_f1_elev_lobby", "to": "n_f1_elev_car", "weight": 2.3, "type": "flat", "accessible": true },
+    { "from": "n_f1_c_elev", "to": "n_f1_c_r102", "weight": 3.0, "type": "flat", "accessible": true },
+    { "from": "n_f1_c_r102", "to": "n_f1_r102_door", "weight": 2.3, "type": "flat", "accessible": true },
+    { "from": "n_f1_r102_door", "to": "n_f1_r102_inside", "weight": 4.7, "type": "flat", "accessible": true },
+    { "from": "n_f1_c_r102", "to": "n_f1_c_mid", "weight": 7.0, "type": "flat", "accessible": true },
+    { "from": "n_f1_c_mid", "to": "n_f1_c_r101", "weight": 6.0, "type": "flat", "accessible": true },
+    { "from": "n_f1_c_r101", "to": "n_f1_r101_door", "weight": 2.3, "type": "flat", "accessible": true },
+    { "from": "n_f1_r101_door", "to": "n_f1_r101_inside", "weight": 4.7, "type": "flat", "accessible": true },
+    { "from": "n_f1_c_r101", "to": "n_f1_c_stair", "weight": 2.5, "type": "flat", "accessible": true },
+    { "from": "n_f1_c_stair", "to": "n_f1_stair_bottom", "weight": 5.5, "type": "flat", "accessible": true },
+    { "from": "n_f1_c_stair", "to": "n_f1_c_north", "weight": 5.5, "type": "flat", "accessible": true },
+
+    { "from": "n_f1_stair_bottom", "to": "n_f2_stair_top", "weight": 10.1, "type": "stairs", "accessible": false },
+
+    { "from": "n_f2_stair_top", "to": "n_f2_c_mid", "weight": 5.5, "type": "flat", "accessible": true },
+    { "from": "n_f2_c_south", "to": "n_f2_c_r203", "weight": 6.0, "type": "flat", "accessible": true },
+    { "from": "n_f2_c_r203", "to": "n_f2_r203_door", "weight": 2.3, "type": "flat", "accessible": true },
+    { "from": "n_f2_r203_door", "to": "n_f2_r203_inside", "weight": 4.7, "type": "flat", "accessible": true },
+    { "from": "n_f2_c_r203", "to": "n_f2_c_elev", "weight": 10.0, "type": "flat", "accessible": true },
+    { "from": "n_f2_c_elev", "to": "n_f2_elev_lobby", "weight": 3.2, "type": "flat", "accessible": true },
+    { "from": "n_f2_elev_lobby", "to": "n_f2_elev_car", "weight": 2.3, "type": "flat", "accessible": true },
+    { "from": "n_f2_c_elev", "to": "n_f2_c_r202", "weight": 3.0, "type": "flat", "accessible": true },
+    { "from": "n_f2_c_r202", "to": "n_f2_r202_door", "weight": 2.3, "type": "flat", "accessible": true },
+    { "from": "n_f2_r202_door", "to": "n_f2_r202_inside", "weight": 4.7, "type": "flat", "accessible": true },
+    { "from": "n_f2_c_r202", "to": "n_f2_c_mid", "weight": 6.5, "type": "flat", "accessible": true },
+    { "from": "n_f2_c_mid", "to": "n_f2_c_r201", "weight": 6.5, "type": "flat", "accessible": true },
+    { "from": "n_f2_c_r201", "to": "n_f2_r201_door", "weight": 2.3, "type": "flat", "accessible": true },
+    { "from": "n_f2_r201_door", "to": "n_f2_r201_inside", "weight": 4.7, "type": "flat", "accessible": true },
+    { "from": "n_f2_c_r201", "to": "n_f2_c_stair", "weight": 2.5, "type": "flat", "accessible": true },
+    { "from": "n_f2_c_stair", "to": "n_f2_stair_bottom", "weight": 5.5, "type": "flat", "accessible": true },
+    { "from": "n_f2_c_stair", "to": "n_f2_c_north", "weight": 5.5, "type": "flat", "accessible": true },
+
+    { "from": "n_f2_stair_bottom", "to": "n_f3_stair_top", "weight": 10.1, "type": "stairs", "accessible": false },
+
+    { "from": "n_f3_stair_top", "to": "n_f3_c_mid", "weight": 5.5, "type": "flat", "accessible": true },
+    { "from": "n_f3_c_south", "to": "n_f3_c_r303", "weight": 6.0, "type": "flat", "accessible": true },
+    { "from": "n_f3_c_r303", "to": "n_f3_r303_door", "weight": 2.3, "type": "flat", "accessible": true },
+    { "from": "n_f3_r303_door", "to": "n_f3_r303_inside", "weight": 4.7, "type": "flat", "accessible": true },
+    { "from": "n_f3_c_r303", "to": "n_f3_c_elev", "weight": 10.0, "type": "flat", "accessible": true },
+    { "from": "n_f3_c_elev", "to": "n_f3_elev_lobby", "weight": 3.2, "type": "flat", "accessible": true },
+    { "from": "n_f3_elev_lobby", "to": "n_f3_elev_car", "weight": 2.3, "type": "flat", "accessible": true },
+    { "from": "n_f3_c_elev", "to": "n_f3_c_r302", "weight": 3.0, "type": "flat", "accessible": true },
+    { "from": "n_f3_c_r302", "to": "n_f3_r302_door", "weight": 2.3, "type": "flat", "accessible": true },
+    { "from": "n_f3_r302_door", "to": "n_f3_r302_inside", "weight": 4.7, "type": "flat", "accessible": true },
+    { "from": "n_f3_c_r302", "to": "n_f3_c_mid", "weight": 6.5, "type": "flat", "accessible": true },
+    { "from": "n_f3_c_mid", "to": "n_f3_c_r301", "weight": 6.5, "type": "flat", "accessible": true },
+    { "from": "n_f3_c_r301", "to": "n_f3_r301_door", "weight": 2.3, "type": "flat", "accessible": true },
+    { "from": "n_f3_r301_door", "to": "n_f3_r301_inside", "weight": 4.7, "type": "flat", "accessible": true },
+    { "from": "n_f3_c_r301", "to": "n_f3_c_north", "weight": 8.0, "type": "flat", "accessible": true },
+
+    { "from": "n_f1_elev_car", "to": "n_f2_elev_car", "weight": 4.5, "type": "elevator", "accessible": true },
+    { "from": "n_f2_elev_car", "to": "n_f3_elev_car", "weight": 4.5, "type": "elevator", "accessible": true }
+  ]
+}

@@ -1,0 +1,101 @@
+[
+  {
+    "id": "room_101",
+    "number": "101",
+    "name": "Techfest Robotics Lab",
+    "floor": 1,
+    "category": "laboratory",
+    "position": { "x": -7.0, "y": 0.0, "z": -14.0 },
+    "door_position": { "x": -2.3, "y": 0.0, "z": -14.0 },
+    "accessible": true,
+    "description": "State-of-the-art robotics hardware demo lab and autonomous rover arena."
+  },
+  {
+    "id": "room_102",
+    "number": "102",
+    "name": "IoT Hardware Studio",
+    "floor": 1,
+    "category": "studio",
+    "position": { "x": -7.0, "y": 0.0, "z": -1.0 },
+    "door_position": { "x": -2.3, "y": 0.0, "z": -1.0 },
+    "accessible": true,
+    "description": "Embedded systems, sensor prototyping, and smart campus mesh hub."
+  },
+  {
+    "id": "room_103",
+    "number": "103",
+    "name": "Admin & Registration",
+    "floor": 1,
+    "category": "administration",
+    "position": { "x": -7.0, "y": 0.0, "z": 12.0 },
+    "door_position": { "x": -2.3, "y": 0.0, "z": 12.0 },
+    "accessible": true,
+    "description": "Visitor check-in, event registration, and information helpdesk."
+  },
+  {
+    "id": "room_201",
+    "number": "201",
+    "name": "AI & Data Science Center",
+    "floor": 2,
+    "category": "laboratory",
+    "position": { "x": -7.0, "y": 4.5, "z": -14.0 },
+    "door_position": { "x": -2.3, "y": 4.5, "z": -14.0 },
+    "accessible": true,
+    "description": "Machine learning supercomputing clusters and neural network testbenches."
+  },
+  {
+    "id": "room_202",
+    "number": "202",
+    "name": "Seminar Hall",
+    "floor": 2,
+    "category": "auditorium",
+    "position": { "x": -7.0, "y": 4.5, "z": -1.0 },
+    "door_position": { "x": -2.3, "y": 4.5, "z": -1.0 },
+    "accessible": true,
+    "description": "120-seat interactive lecture hall for keynote speeches and tech talks."
+  },
+  {
+    "id": "room_203",
+    "number": "203",
+    "name": "Cyber Security Arena",
+    "floor": 2,
+    "category": "laboratory",
+    "position": { "x": -7.0, "y": 4.5, "z": 12.0 },
+    "door_position": { "x": -2.3, "y": 4.5, "z": 12.0 },
+    "accessible": true,
+    "description": "CTF competition operations center and network defense simulation suite."
+  },
+  {
+    "id": "room_301",
+    "number": "301",
+    "name": "Innovation Incubation Cell",
+    "floor": 3,
+    "category": "incubator",
+    "position": { "x": -7.0, "y": 9.0, "z": -14.0 },
+    "door_position": { "x": -2.3, "y": 9.0, "z": -14.0 },
+    "accessible": true,
+    "description": "Student startup accelerator workspace and venture mentoring zone."
+  },
+  {
+    "id": "room_302",
+    "number": "302",
+    "name": "Executive Board Room",
+    "floor": 3,
+    "category": "conference",
+    "position": { "x": -7.0, "y": 9.0, "z": -1.0 },
+    "door_position": { "x": -2.3, "y": 9.0, "z": -1.0 },
+    "accessible": true,
+    "description": "High-level judging committee and faculty advisory meeting room."
+  },
+  {
+    "id": "room_303",
+    "number": "303",
+    "name": "Dean & Faculty Lounge",
+    "floor": 3,
+    "category": "lounge",
+    "position": { "x": -7.0, "y": 9.0, "z": 12.0 },
+    "door_position": { "x": -2.3, "y": 9.0, "z": 12.0 },
+    "accessible": true,
+    "description": "VIP speaker reception and academic faculty quarters."
+  }
+]

@@ -1,0 +1,41 @@
+{
+  "building": {
+    "name": "Techfest Academic Complex",
+    "campus": "IIT Bombay",
+    "levels": 3,
+    "floor_height_meters": 4.5,
+    "dimensions_meters": {
+      "width": 24.0,
+      "length": 50.0,
+      "total_height": 13.5
+    },
+    "facilities": {
+      "staircases": ["Staircase A"],
+      "elevators": ["Elevator A"],
+      "entrances": ["Main South Entrance"]
+    }
+  },
+  "floors": [
+    {
+      "floor": 1,
+      "name": "Ground Floor",
+      "elevation": 0.0,
+      "rooms_count": 3,
+      "highlights": ["Techfest Robotics Lab", "IoT Hardware Studio", "Admin & Registration", "Main Entrance"]
+    },
+    {
+      "floor": 2,
+      "name": "Second Floor",
+      "elevation": 4.5,
+      "rooms_count": 3,
+      "highlights": ["AI & Data Science Center", "Seminar Hall", "Cyber Security Arena"]
+    },
+    {
+      "floor": 3,
+      "name": "Third Floor",
+      "elevation": 9.0,
+      "rooms_count": 3,
+      "highlights": ["Innovation Incubation Cell", "Executive Board Room", "Dean & Faculty Lounge"]
+    }
+  ]
+}
