@@ -120,6 +120,16 @@ export class PhysicsWorld {
     return { body, collider };
   }
 
+  removeBody(body: RAPIER.RigidBody): void {
+    if (this.world && body) {
+      try {
+        this.world.removeRigidBody(body);
+      } catch (err) {
+        console.warn('PhysicsWorld.removeBody warning:', err);
+      }
+    }
+  }
+
   dispose(): void {
     if (this.world) {
       this.world.free();

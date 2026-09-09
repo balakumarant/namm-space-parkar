@@ -3,7 +3,7 @@ import { useGameStore } from '../../stores/useGameStore';
 import { clientPathfinder } from '../../services/pathfinding';
 import { Navigation, Zap, Accessibility, Footprints, X, ChevronDown, MapPin, Clock, Route as RouteIcon } from 'lucide-react';
 
-const DESTINATIONS = [
+const PROCEDURAL_DESTINATIONS = [
   { id: 'n_f1_r101_inside', name: 'Room 101 - Robotics Lab', floor: 1 },
   { id: 'n_f1_r102_inside', name: 'Room 102 - IoT Studio', floor: 1 },
   { id: 'n_f1_r103_inside', name: 'Room 103 - Admin & Registration', floor: 1 },
@@ -16,10 +16,30 @@ const DESTINATIONS = [
   { id: 'n_f1_entrance', name: 'Main South Entrance', floor: 1 },
 ];
 
+const RECONSTRUCTED_DESTINATIONS = [
+  { id: 'room_101', name: 'Room 101 - Techfest Robotics Wing', floor: 1 },
+  { id: 'f1_entrance', name: 'Main South Entrance', floor: 1 },
+  { id: 'f1_stairs', name: 'Grand Foyer Staircase', floor: 1 },
+  { id: 'f1_c_mid', name: 'Central Gallery Concourse', floor: 1 },
+  { id: 'f1_c_north', name: 'Executive Lounge & Seminar Arena', floor: 1 },
+];
+
 export const RoutePanel: React.FC = () => {
+  const buildingMode = useGameStore((state) => state.buildingMode);
+  const destinations = buildingMode === 'reconstructed' ? RECONSTRUCTED_DESTINATIONS : PROCEDURAL_DESTINATIONS;
+
   const [isOpen, setIsOpen] = useState(false);
-  const [selectedDestId, setSelectedDestId] = useState<string>(DESTINATIONS[6].id); // Room 301 default
+  const [selectedDestId, setSelectedDestId] = useState<string>(
+    buildingMode === 'reconstructed' ? RECONSTRUCTED_DESTINATIONS[0].id : PROCEDURAL_DESTINATIONS[6].id
+  );
   const [loading, setLoading] = useState(false);
+
+  // Sync selectedDestId if mode switches
+  React.useEffect(() => {
+    setSelectedDestId(
+      buildingMode === 'reconstructed' ? RECONSTRUCTED_DESTINATIONS[0].id : PROCEDURAL_DESTINATIONS[6].id
+    );
+  }, [buildingMode]);
 
   const playerPos = useGameStore((state) => state.playerPosition);
   const currentFloor = useGameStore((state) => state.currentFloor);
@@ -35,7 +55,7 @@ export const RoutePanel: React.FC = () => {
   const setNotification = useGameStore((state) => state.setNotification);
 
   const handleComputeRoute = async () => {
-    const dest = DESTINATIONS.find((d) => d.id === selectedDestId);
+    const dest = destinations.find((d) => d.id === selectedDestId);
     if (!dest) return;
 
     setLoading(true);
@@ -45,7 +65,8 @@ export const RoutePanel: React.FC = () => {
         playerPos.y,
         playerPos.z,
         dest.id,
-        currentFloor
+        currentFloor,
+        buildingMode
       );
 
       if (response.routes.length > 0) {
@@ -120,9 +141,9 @@ export const RoutePanel: React.FC = () => {
                 onChange={(e) => setSelectedDestId(e.target.value)}
                 className="w-full appearance-none bg-slate-900/90 border border-slate-700 rounded-lg px-3 py-2.5 text-xs font-medium text-white focus:outline-none focus:border-cyan-400 cursor-pointer pr-8"
               >
-                {DESTINATIONS.map((d) => (
+                {destinations.map((d) => (
                   <option key={d.id} value={d.id} className="bg-slate-900 text-white">
-                    {d.name} (Floor {d.floor})
+                    {d.name} {buildingMode === 'reconstructed' ? '(Ground Floor)' : `(Floor ${d.floor})`}
                   </option>
                 ))}
               </select>

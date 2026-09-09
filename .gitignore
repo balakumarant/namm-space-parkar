@@ -25,3 +25,23 @@ Thumbs.db
 .idea/
 .vscode/
 *.swp
+
+# Phase 5: Reconstruction Videos & Large Artifacts
+*.mp4
+*.mov
+*.avi
+*.mkv
+reconstruction/frames/
+reconstruction/temp/
+reconstruction/output/*.ply
+reconstruction/output/*.obj
+reconstruction/output/*.xyz
+reconstruction/output/*.splat
+reconstruction/output/pointcloud/
+reconstruction/output/mesh/
+reconstruction/input/inspection_frames/
+reconstruction/input/inspection_frames_indoor/
+reconstruction/input/inspection_frames_walkthrough/
+!reconstruction/input/.gitkeep
+!reconstruction/output/.gitkeep
+

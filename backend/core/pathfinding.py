@@ -356,4 +356,41 @@ class SpatialPathfinder:
             routes=routes
         )
 
+RECONSTRUCTED_DATA_FILE = Path(__file__).parent.parent / "data" / "reconstructed_spatial_graph.json"
+
 pathfinder = SpatialPathfinder()
+reconstructed_pathfinder = SpatialPathfinder(RECONSTRUCTED_DATA_FILE) if RECONSTRUCTED_DATA_FILE.exists() else pathfinder
+
+RECONSTRUCTED_POI_TO_NODE = {
+    "f1_entrance": "rec_n_entrance",
+    "f1_stairs": "rec_n_stairs",
+    "f1_c_mid": "rec_n_c_mid",
+    "room_101": "rec_n_room_101",
+    "f1_c_north": "rec_n_lounge",
+}
+
+def get_routes_for_mode(
+    start_x: float,
+    start_y: float,
+    start_z: float,
+    dest_id: str,
+    start_floor: Optional[int] = None,
+    mode: str = "procedural"
+) -> RouteCalculationResponse:
+    if mode == "reconstructed" or dest_id.startswith("rec_") or dest_id in RECONSTRUCTED_POI_TO_NODE:
+        actual_dest = RECONSTRUCTED_POI_TO_NODE.get(dest_id, dest_id)
+        return reconstructed_pathfinder.get_multi_routes(
+            start_x=start_x,
+            start_y=start_y,
+            start_z=start_z,
+            dest_node_id=actual_dest,
+            start_floor=1
+        )
+    return pathfinder.get_multi_routes(
+        start_x=start_x,
+        start_y=start_y,
+        start_z=start_z,
+        dest_node_id=dest_id,
+        start_floor=start_floor
+    )
+

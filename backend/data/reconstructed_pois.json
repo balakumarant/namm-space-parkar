@@ -1,0 +1,67 @@
+[
+  {
+    "id": "f1_entrance",
+    "name": "Main South Entrance",
+    "floor": 1,
+    "category": "entrance",
+    "node_id": "rec_n_entrance",
+    "coordinates": {
+      "x": 0.0,
+      "y": 0.0,
+      "z": 4.5
+    },
+    "description": "Main entrance vestibule to the reconstructed digital twin building."
+  },
+  {
+    "id": "f1_stairs",
+    "name": "Grand Foyer Staircase",
+    "floor": 1,
+    "category": "stairs",
+    "node_id": "rec_n_stairs",
+    "coordinates": {
+      "x": 1.5,
+      "y": 0.0,
+      "z": 5.2
+    },
+    "description": "Architectural staircase access in the entrance foyer."
+  },
+  {
+    "id": "f1_c_mid",
+    "name": "Central Gallery Concourse",
+    "floor": 1,
+    "category": "concourse",
+    "node_id": "rec_n_c_mid",
+    "coordinates": {
+      "x": 0.0,
+      "y": 0.0,
+      "z": 20.0
+    },
+    "description": "Central corridor connecting the foyer to the west lab and north lounge."
+  },
+  {
+    "id": "room_101",
+    "name": "Room 101 - Techfest Robotics Wing",
+    "floor": 1,
+    "category": "lab",
+    "node_id": "rec_n_room_101",
+    "coordinates": {
+      "x": -5.5,
+      "y": 0.0,
+      "z": 28.0
+    },
+    "description": "Techfest robotics laboratory and demonstration wing."
+  },
+  {
+    "id": "f1_c_north",
+    "name": "Executive Lounge & Seminar Arena",
+    "floor": 1,
+    "category": "lounge",
+    "node_id": "rec_n_lounge",
+    "coordinates": {
+      "x": 0.0,
+      "y": 0.0,
+      "z": 48.0
+    },
+    "description": "Open-plan executive lounge and seminar space in the north wing."
+  }
+]

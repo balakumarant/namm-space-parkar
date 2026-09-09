@@ -31,7 +31,7 @@ export class SceneManager {
     this.renderer.shadowMap.type = THREE.PCFSoftShadowMap;
     this.renderer.toneMapping = THREE.ACESFilmicToneMapping;
     this.renderer.toneMappingExposure = 1.05;
-
+    this.renderer.domElement.classList.add('game-canvas');
     container.appendChild(this.renderer.domElement);
 
     // 4. Lighting & Ambience

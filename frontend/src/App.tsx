@@ -59,13 +59,35 @@ export const App: React.FC = () => {
     }
   }, [activeRoute]);
 
+  // Synchronize buildingMode changes (procedural <-> reconstructed)
+  const buildingMode = useGameStore((state) => state.buildingMode);
+  useEffect(() => {
+    if (engineRef.current) {
+      engineRef.current.switchBuildingMode(buildingMode).catch((err) => {
+        console.warn('Failed to switch building mode:', err);
+      });
+    }
+  }, [buildingMode]);
+
+  const handlePlay = () => {
+    engineRef.current?.requestPointerLock();
+  };
+
   return (
     <div className="relative w-screen h-screen overflow-hidden bg-[#080b10]">
       {/* 3D WebGL Canvas Container */}
-      <div ref={containerRef} className="w-full h-full cursor-crosshair" />
+      <div 
+        ref={containerRef} 
+        className="w-full h-full cursor-crosshair"
+        onClick={() => {
+          if (useGameStore.getState().hasStarted) {
+            engineRef.current?.requestPointerLock();
+          }
+        }}
+      />
 
       {/* Modern Game HUD Overlay */}
-      <GameHUD />
+      <GameHUD onPlay={handlePlay} />
     </div>
   );
 };

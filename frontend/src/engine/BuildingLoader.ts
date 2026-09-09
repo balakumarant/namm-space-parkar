@@ -1,9 +1,23 @@
 import * as THREE from 'three';
+import RAPIER from '@dimforge/rapier3d-compat';
 import { PhysicsWorld } from './PhysicsWorld';
-import { InteractiveZone, RoomDefinition, FloorDefinition } from './types';
+import { InteractiveZone, RoomDefinition, FloorDefinition, Vector3Tuple } from './types';
+import { BUILDING_CONFIG, BuildingMode, getInitialBuildingMode } from '../config/buildingConfig';
+import { DebugVisualizer } from './DebugVisualizer';
+import {
+  RECONSTRUCTED_GRAPH_NODES,
+  RECONSTRUCTED_GRAPH_EDGES,
+  RECONSTRUCTED_POI_ANCHORS,
+} from '../services/reconstructedGraphAdapter';
 
 export interface IBuildingLoader {
-  build(scene: THREE.Scene, physics: PhysicsWorld): Promise<void>;
+  build(scene: THREE.Scene, physics: PhysicsWorld, debugVisualizer?: DebugVisualizer): Promise<void>;
+  loadProceduralBuilding(): Promise<void>;
+  loadReconstructedBuilding(glbUrl?: string, metadataUrl?: string, debugVisualizer?: DebugVisualizer): Promise<void>;
+  setMode(mode: BuildingMode): void;
+  getMode(): BuildingMode;
+  getSpawnPosition(): Vector3Tuple;
+  getSpawnYaw(): number;
   getInteractiveZones(): InteractiveZone[];
   getFloors(): FloorDefinition[];
   getFloorByHeight(y: number): number;
@@ -11,16 +25,54 @@ export interface IBuildingLoader {
 }
 
 export class BuildingLoader implements IBuildingLoader {
+  private buildingMode: BuildingMode = getInitialBuildingMode();
   private interactiveZones: InteractiveZone[] = [];
   private floors: FloorDefinition[] = [];
   private buildingGroup: THREE.Group = new THREE.Group();
   private scene: THREE.Scene | null = null;
   private physics: PhysicsWorld | null = null;
   private materials: { [key: string]: THREE.Material } = {};
+  private staticBodies: RAPIER.RigidBody[] = [];
+  private reconstructedModel: THREE.Object3D | null = null;
+  private reconstructedMetadata: any = null;
+  private debugVisualizer: DebugVisualizer | null = null;
 
-  constructor() {
+  constructor(initialMode?: BuildingMode) {
+    if (initialMode) {
+      this.buildingMode = initialMode;
+    }
     this.initMaterials();
     this.initFloorSpecs();
+  }
+
+  public getReconstructedModel(): THREE.Object3D | null {
+    return this.reconstructedModel;
+  }
+
+  public getReconstructedMetadata(): any {
+    return this.reconstructedMetadata;
+  }
+
+  public setMode(mode: BuildingMode): void {
+    this.buildingMode = mode;
+  }
+
+  public getMode(): BuildingMode {
+    return this.buildingMode;
+  }
+
+  public getSpawnPosition(): Vector3Tuple {
+    if (this.buildingMode === 'reconstructed') {
+      return { ...BUILDING_CONFIG.reconstructedSpawn };
+    }
+    return { ...BUILDING_CONFIG.proceduralSpawn };
+  }
+
+  public getSpawnYaw(): number {
+    if (this.buildingMode === 'reconstructed') {
+      return Math.PI; // Facing forward (+Z) into the reconstructed foyer and corridors
+    }
+    return 0.0; // Facing north (-Z) towards Room 101-103
   }
 
   private initMaterials(): void {
@@ -227,11 +279,82 @@ export class BuildingLoader implements IBuildingLoader {
     ];
   }
 
-  async build(scene: THREE.Scene, physics: PhysicsWorld): Promise<void> {
+  private addStaticBox(
+    posX: number,
+    posY: number,
+    posZ: number,
+    halfWidth: number,
+    halfHeight: number,
+    halfDepth: number,
+    friction: number = 0.5
+  ): void {
+    if (!this.physics) return;
+    const res = this.physics.createStaticBox(posX, posY, posZ, halfWidth, halfHeight, halfDepth, friction);
+    if (res) {
+      this.staticBodies.push(res.body);
+    }
+  }
+
+  private addStaticIncline(
+    posX: number,
+    posY: number,
+    posZ: number,
+    halfWidth: number,
+    halfHeight: number,
+    halfDepth: number,
+    rotationX: number = 0,
+    rotationY: number = 0,
+    rotationZ: number = 0
+  ): void {
+    if (!this.physics) return;
+    const res = this.physics.createStaticIncline(posX, posY, posZ, halfWidth, halfHeight, halfDepth, rotationX, rotationY, rotationZ);
+    if (res) {
+      this.staticBodies.push(res.body);
+    }
+  }
+
+  private clearPhysicsBodies(): void {
+    if (this.physics) {
+      for (const body of this.staticBodies) {
+        this.physics.removeBody(body);
+      }
+    }
+    this.staticBodies = [];
+  }
+
+  async build(scene: THREE.Scene, physics: PhysicsWorld, debugVisualizer?: DebugVisualizer): Promise<void> {
     this.scene = scene;
     this.physics = physics;
-    this.scene.add(this.buildingGroup);
+    if (debugVisualizer) {
+      this.debugVisualizer = debugVisualizer;
+    }
 
+    // Clear any previous geometry & colliders
+    while (this.buildingGroup.children.length > 0) {
+      const child = this.buildingGroup.children[0];
+      this.buildingGroup.remove(child);
+      if ((child as any).geometry) (child as any).geometry.dispose();
+    }
+    this.clearPhysicsBodies();
+
+    if (!this.scene.children.includes(this.buildingGroup)) {
+      this.scene.add(this.buildingGroup);
+    }
+
+    if (this.buildingMode === 'reconstructed') {
+      try {
+        await this.loadReconstructedBuilding(undefined, undefined, debugVisualizer);
+      } catch (err) {
+        console.warn('[Reconstruction Fallback] Reconstructed building failed to load, falling back to procedural building:', err);
+        this.buildingMode = 'procedural';
+        await this.loadProceduralBuilding();
+      }
+    } else {
+      await this.loadProceduralBuilding();
+    }
+  }
+
+  public async loadProceduralBuilding(): Promise<void> {
     // Build Ground & Floors
     this.buildFloorsAndCeilings();
 
@@ -252,6 +375,186 @@ export class BuildingLoader implements IBuildingLoader {
 
     // Register Interactive Zones
     this.registerInteractiveZones();
+  }
+
+  public async loadReconstructedBuilding(
+    glbUrl: string = BUILDING_CONFIG.glbUrl,
+    metadataUrl: string = BUILDING_CONFIG.metadataUrl,
+    debugVisualizer?: DebugVisualizer
+  ): Promise<void> {
+    const { GLTFLoader } = await import('three/examples/jsm/loaders/GLTFLoader.js');
+    const loader = new GLTFLoader();
+
+    // 1. Fetch metadata if available
+    try {
+      const res = await fetch(metadataUrl);
+      if (res.ok) {
+        this.reconstructedMetadata = await res.json();
+      }
+    } catch (e) {
+      console.warn('Could not load reconstructed metadata:', e);
+    }
+
+    // 2. Load GLB model
+    const gltf = await new Promise<any>((resolve, reject) => {
+      loader.load(glbUrl, resolve, undefined, reject);
+    });
+
+    const model = gltf.scene || gltf.scenes[0];
+    this.reconstructedModel = model;
+
+    // Apply vertical ground alignment:
+    // In raw photogrammetry, entrance floor is at Y = -1.70m (camera at eye height Y = 0)
+    // We elevate the model by +1.70m along Y so the entrance floor sits at Y = 0.0m
+    model.position.set(
+      BUILDING_CONFIG.reconstructedOffset.x,
+      BUILDING_CONFIG.reconstructedOffset.y,
+      BUILDING_CONFIG.reconstructedOffset.z
+    );
+
+    model.traverse((child: any) => {
+      if (child.isMesh) {
+        child.castShadow = true;
+        child.receiveShadow = true;
+        if (child.geometry) {
+          child.geometry.computeVertexNormals();
+        }
+        if (child.material) {
+          child.material.side = THREE.DoubleSide;
+          if (child.geometry && child.geometry.attributes.color) {
+            child.material.vertexColors = true;
+          }
+          child.material.roughness = 0.65;
+          child.material.metalness = 0.1;
+          child.material.needsUpdate = true;
+        }
+      }
+    });
+
+    this.buildingGroup.add(model);
+
+    // 3. Register separated Rapier physics colliders
+    // Top surface of walkable floor at Y = 0.0m
+    // Bounds: X [-13.03, 10.37] (width 23.4m), Z [2.14, 54.37] (length 52.23m)
+    const floorCenterX = -1.33;
+    const floorCenterZ = 28.26;
+    const floorHalfW = 11.70;
+    const floorHalfL = 26.12;
+
+    // Walkable floor slab (thickness 0.3m, top at Y = 0.0m)
+    this.addStaticBox(floorCenterX, -0.15, floorCenterZ, floorHalfW, 0.15, floorHalfL, 0.6);
+
+    // Outer boundary walls (prevent falling off or escaping the reconstructed building)
+    const wallH = 2.5;
+    this.addStaticBox(-13.1, wallH, floorCenterZ, 0.2, wallH, floorHalfL); // West wall
+    this.addStaticBox(10.4, wallH, floorCenterZ, 0.2, wallH, floorHalfL);  // East wall
+    this.addStaticBox(floorCenterX, wallH, 2.14, floorHalfW, wallH, 0.2); // South entrance back wall
+    this.addStaticBox(floorCenterX, wallH, 54.37, floorHalfW, wallH, 0.2); // North far end wall
+
+    // Hallway corridor partitions at the entrance foyer (creating natural guided hallway)
+    this.addStaticBox(-1.3, 2.0, 4.75, 0.15, 2.0, 2.25); // West entrance partition
+    this.addStaticBox(1.9, 2.0, 4.25, 0.15, 2.0, 1.75);  // East entrance partition
+
+    // Foyer staircase incline & landing (staircase at X: 0.8 to 2.5, Z: 3.5 to 7.0)
+    this.addStaticIncline(1.65, 0.8, 5.25, 0.8, 0.15, 1.6, 0.44); // Incline ramp
+    this.addStaticBox(1.65, 1.6, 6.8, 0.8, 0.15, 0.5);            // Top landing
+
+    // Major obstacles: Central fireplace column and dining table volume
+    this.addStaticBox(-1.5, 2.0, 22.0, 0.6, 2.0, 0.6);  // Central structural column / fireplace
+    this.addStaticBox(0.0, 0.45, 34.0, 1.2, 0.45, 1.8);  // Central dining table area
+
+    // 4. Floating 3D Signage Badges for Reconstructed Areas
+    const signFoyer = this.createFloatingTextBadge('MAIN SOUTH ENTRANCE', 4.0, 1.0, 0x00f2fe);
+    signFoyer.position.set(0.0, 2.4, 4.5);
+    this.buildingGroup.add(signFoyer);
+
+    const signStairs = this.createFloatingTextBadge('FOYER STAIRCASE', 3.5, 0.9, 0xf59e0b);
+    signStairs.position.set(1.65, 2.4, 5.25);
+    this.buildingGroup.add(signStairs);
+
+    const signLab = this.createFloatingTextBadge('ROOM 101 - ROBOTICS WING', 4.5, 1.0, 0x10b981);
+    signLab.position.set(-5.5, 2.4, 28.0);
+    this.buildingGroup.add(signLab);
+
+    const signLounge = this.createFloatingTextBadge('EXECUTIVE SEMINAR ARENA', 4.5, 1.0, 0x8b5cf6);
+    signLounge.position.set(0.0, 2.4, 48.0);
+    this.buildingGroup.add(signLounge);
+
+    // 5. Register interactive zones
+    this.registerReconstructedInteractiveZones();
+
+    // 6. Debug visualizer setup if active
+    const dbg = debugVisualizer || this.debugVisualizer;
+    if (dbg) {
+      dbg.clear();
+      // Model bounding box (offset by Y + 1.70)
+      dbg.addBoundingBox(
+        new THREE.Vector3(-13.03, -4.86, 2.14),
+        new THREE.Vector3(10.37, 7.07, 54.37),
+        0x00f2fe
+      );
+      dbg.addSpawnMarker(BUILDING_CONFIG.reconstructedSpawn, 0x00ff88);
+      // Floor wireframe
+      dbg.addCollisionBox(floorCenterX, -0.15, floorCenterZ, floorHalfW, 0.15, floorHalfL, 0x00aaff);
+      // Outer walls
+      dbg.addCollisionBox(-13.1, wallH, floorCenterZ, 0.2, wallH, floorHalfL, 0xffaa00);
+      dbg.addCollisionBox(10.4, wallH, floorCenterZ, 0.2, wallH, floorHalfL, 0xffaa00);
+      dbg.addCollisionBox(floorCenterX, wallH, 2.14, floorHalfW, wallH, 0.2, 0xffaa00);
+      dbg.addCollisionBox(floorCenterX, wallH, 54.37, floorHalfW, wallH, 0.2, 0xffaa00);
+      // Partitions
+      dbg.addCollisionBox(-1.3, 2.0, 4.75, 0.15, 2.0, 2.25, 0xff5500);
+      dbg.addCollisionBox(1.9, 2.0, 4.25, 0.15, 2.0, 1.75, 0xff5500);
+      // Obstacles
+      dbg.addCollisionBox(-1.5, 2.0, 22.0, 0.6, 2.0, 0.6, 0xff00ff);
+      dbg.addCollisionBox(0.0, 0.45, 34.0, 1.2, 0.45, 1.8, 0xff00ff);
+      // Axes and grid
+      dbg.addAxes(5.0);
+      dbg.addFloorGrid(60, 60, 0.0);
+
+      // Reconstructed Navigation Graph & POI Anchors
+      dbg.visualizeReconstructedGraph(
+        RECONSTRUCTED_GRAPH_NODES,
+        RECONSTRUCTED_GRAPH_EDGES,
+        RECONSTRUCTED_POI_ANCHORS
+      );
+    }
+  }
+
+  private registerReconstructedInteractiveZones(): void {
+    this.interactiveZones = [
+      {
+        id: 'rec_zone_entrance',
+        name: 'Main South Entrance Portal',
+        type: 'info',
+        position: { x: 0.0, y: 0.0, z: 4.5 },
+        radius: 3.0,
+        prompt: 'Press [E] to Inspect Reconstructed IIT Bombay Twin Portal',
+      },
+      {
+        id: 'rec_zone_stairs',
+        name: 'Grand Foyer Staircase',
+        type: 'stairs',
+        position: { x: 1.5, y: 0.0, z: 5.2 },
+        radius: 2.5,
+        prompt: 'Press [E] to Climb Foyer Staircase',
+      },
+      {
+        id: 'rec_zone_lab_101',
+        name: 'Room 101 - Techfest Robotics Wing',
+        type: 'room',
+        position: { x: -5.5, y: 0.0, z: 28.0 },
+        radius: 4.0,
+        prompt: 'Press [E] to Enter Room 101 Robotics Wing',
+      },
+      {
+        id: 'rec_zone_living_lounge',
+        name: 'Executive Lounge & Seminar Arena',
+        type: 'room',
+        position: { x: 0.0, y: 0.0, z: 48.0 },
+        radius: 5.0,
+        prompt: 'Press [E] to Access Executive Seminar Arena',
+      },
+    ];
   }
 
   private buildFloorsAndCeilings(): void {
@@ -726,6 +1029,12 @@ export class BuildingLoader implements IBuildingLoader {
   }
 
   dispose(): void {
+    this.clearPhysicsBodies();
+    while (this.buildingGroup.children.length > 0) {
+      const child = this.buildingGroup.children[0];
+      this.buildingGroup.remove(child);
+      if ((child as any).geometry) (child as any).geometry.dispose();
+    }
     if (this.scene && this.buildingGroup) {
       this.scene.remove(this.buildingGroup);
     }

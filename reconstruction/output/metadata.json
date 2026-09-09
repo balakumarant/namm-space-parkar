@@ -1,0 +1,96 @@
+{
+  "building_name": "Reconstructed Digital Twin - Main Wing",
+  "format": "GLB / glTF 2.0 Binary",
+  "units": "meters",
+  "scale_calibrated": true,
+  "scale_factor": 1.0,
+  "dimensions": {
+    "width_meters": 21.75,
+    "height_meters": 7.2,
+    "length_meters": 42.65
+  },
+  "bounds": {
+    "min": [
+      -12.36,
+      -3.2,
+      5.34
+    ],
+    "max": [
+      9.4,
+      4.0,
+      47.99
+    ]
+  },
+  "mesh_stats": {
+    "vertices": 13702,
+    "faces": 11780,
+    "file_size_bytes": 361584
+  },
+  "floors": [
+    {
+      "floor": 1,
+      "elevation_meters": 0.0,
+      "height_meters": 7.2,
+      "walkable_surface": {
+        "min_x": -12.36,
+        "max_x": 9.4,
+        "min_z": 5.34,
+        "max_z": 47.99
+      }
+    }
+  ],
+  "rooms": [
+    {
+      "id": "rec_room_101",
+      "name": "Room 101 - Reconstructed Robotics Lab",
+      "floor": 1,
+      "center": [
+        -5.5,
+        0.0,
+        -8.0
+      ],
+      "door": [
+        -2.0,
+        0.0,
+        -8.0
+      ]
+    },
+    {
+      "id": "rec_room_102",
+      "name": "Room 102 - Reconstructed Hardware Lab",
+      "floor": 1,
+      "center": [
+        -5.5,
+        0.0,
+        4.0
+      ],
+      "door": [
+        -2.0,
+        0.0,
+        4.0
+      ]
+    }
+  ],
+  "pois": [
+    {
+      "id": "rec_poi_entrance",
+      "name": "Main Entrance Portal",
+      "floor": 1,
+      "coords": [
+        0.0,
+        0.5,
+        45.99
+      ]
+    },
+    {
+      "id": "rec_poi_elevator",
+      "name": "Elevator A (North Lobby)",
+      "floor": 1,
+      "coords": [
+        0.0,
+        0.5,
+        8.34
+      ]
+    }
+  ]
+}

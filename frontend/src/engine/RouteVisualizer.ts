@@ -53,9 +53,18 @@ export class RouteVisualizer {
 
     this.currentWaypoints = waypoints;
 
-    // 1. Build points array lifted 0.25m above floor surface
+    // Detect if this is a reconstructed mode route
+    const isReconstructed = waypoints.some(
+      (w) => w.id.startsWith('rec_') || ['f1_entrance', 'f1_stairs', 'f1_c_mid', 'room_101', 'f1_c_north'].includes(w.id)
+    );
+
+    // Calibrate vertical offset: 0.08m for reconstructed mode to prevent z-fighting without floating
+    const yOffset = isReconstructed ? 0.08 : 0.25;
+    const tubeRadius = isReconstructed ? 0.05 : 0.08;
+
+    // 1. Build points array lifted above floor surface
     const points: THREE.Vector3[] = waypoints.map((w) => {
-      return new THREE.Vector3(w.x, w.y + 0.25, w.z);
+      return new THREE.Vector3(w.x, w.y + yOffset, w.z);
     });
 
     // 2. Build smoothed CatmullRomCurve3
@@ -63,16 +72,16 @@ export class RouteVisualizer {
 
     // 3. Glowing Tube Geometry
     const tubularSegments = Math.max(60, points.length * 15);
-    const radius = 0.08;
     const radialSegments = 8;
-    const tubeGeometry = new THREE.TubeGeometry(curve, tubularSegments, radius, radialSegments, false);
+    const tubeGeometry = new THREE.TubeGeometry(curve, tubularSegments, tubeRadius, radialSegments, false);
 
     this.pathMesh = new THREE.Mesh(tubeGeometry, this.tubeMaterial);
     this.routeGroup.add(this.pathMesh);
 
-    // 4. Directional Chevron Markers spaced every 2 meters
+    // 4. Directional Chevron Markers spaced along the route
     const curveLength = curve.getLength();
-    const chevronCount = Math.floor(curveLength / 2.2);
+    const chevronSpacing = isReconstructed ? 1.8 : 2.2;
+    const chevronCount = Math.floor(curveLength / chevronSpacing);
 
     for (let i = 1; i < chevronCount; i++) {
       const t = i / chevronCount;
@@ -80,7 +89,9 @@ export class RouteVisualizer {
       const tangent = curve.getTangentAt(t).normalize();
 
       // Mini arrow / cone pointer
-      const coneGeom = new THREE.ConeGeometry(0.18, 0.35, 6);
+      const coneRadius = isReconstructed ? 0.12 : 0.18;
+      const coneHeight = isReconstructed ? 0.25 : 0.35;
+      const coneGeom = new THREE.ConeGeometry(coneRadius, coneHeight, 6);
       coneGeom.rotateX(Math.PI / 2); // Point forward
 
       const coneMat = new THREE.MeshBasicMaterial({
@@ -89,6 +100,8 @@ export class RouteVisualizer {
 
       const cone = new THREE.Mesh(coneGeom, coneMat);
       cone.position.copy(pos);
+      // Small vertical lift above tube surface
+      cone.position.y += tubeRadius + 0.02;
 
       // Orient cone in tangent direction
       const lookTarget = pos.clone().add(tangent);
@@ -109,36 +122,39 @@ export class RouteVisualizer {
             wireframe: true,
           })
         );
-        ringMesh.position.set(w.x, w.y + 0.3, w.z);
+        ringMesh.position.set(w.x, w.y + (isReconstructed ? 0.15 : 0.3), w.z);
         this.transitionMarkers.add(ringMesh);
       }
     });
 
     // 6. Holographic Destination Beacon
     const dest = points[points.length - 1];
-    this.buildDestinationBeacon(dest);
+    this.buildDestinationBeacon(dest, isReconstructed);
   }
 
-  private buildDestinationBeacon(pos: THREE.Vector3): void {
+  private buildDestinationBeacon(pos: THREE.Vector3, isReconstructed: boolean = false): void {
+    const beamHeight = isReconstructed ? 2.5 : 3.5;
+    const beamRadius = isReconstructed ? 0.25 : 0.35;
+
     // Vertical light beam cylinder
-    const beamGeom = new THREE.CylinderGeometry(0.35, 0.35, 3.5, 16, 1, true);
-    beamGeom.translate(0, 1.75, 0);
+    const beamGeom = new THREE.CylinderGeometry(beamRadius, beamRadius, beamHeight, 16, 1, true);
+    beamGeom.translate(0, beamHeight / 2, 0);
     const beam = new THREE.Mesh(beamGeom, this.beaconMaterial);
     beam.position.copy(pos);
     this.destinationBeacon.add(beam);
 
     // Pulsating target rings
-    const targetRingGeom = new THREE.RingGeometry(0.5, 0.75, 24);
+    const targetRingGeom = new THREE.RingGeometry(0.4, 0.65, 24);
     targetRingGeom.rotateX(-Math.PI / 2);
     const targetRing = new THREE.Mesh(targetRingGeom, this.ringMaterial);
-    targetRing.position.set(pos.x, pos.y + 0.05, pos.z);
+    targetRing.position.set(pos.x, pos.y + 0.02, pos.z);
     this.destinationBeacon.add(targetRing);
 
     // Floating diamond indicator
-    const diamondGeom = new THREE.OctahedronGeometry(0.35);
+    const diamondGeom = new THREE.OctahedronGeometry(0.25);
     const diamondMat = new THREE.MeshBasicMaterial({ color: 0x00f2fe });
     const diamond = new THREE.Mesh(diamondGeom, diamondMat);
-    diamond.position.set(pos.x, pos.y + 2.8, pos.z);
+    diamond.position.set(pos.x, pos.y + beamHeight * 0.8, pos.z);
     this.destinationBeacon.add(diamond);
   }
 

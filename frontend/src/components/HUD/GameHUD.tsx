@@ -3,14 +3,24 @@ import { useGameStore } from '../../stores/useGameStore';
 import { Layers, Compass, Footprints, Eye } from 'lucide-react';
 import { RoutePanel } from './RoutePanel';
 import { TurnByTurnCard } from './TurnByTurnCard';
+import { Minimap } from './Minimap';
+import { ParkarChatDrawer } from '../ParkarChat/ParkarChatDrawer';
 
-export const GameHUD: React.FC = () => {
+interface GameHUDProps {
+  onPlay?: () => void;
+}
+
+export const GameHUD: React.FC<GameHUDProps> = ({ onPlay }) => {
+  const hasStarted = useGameStore((state) => state.hasStarted);
+  const startGame = useGameStore((state) => state.startGame);
   const currentFloor = useGameStore((state) => state.currentFloor);
   const playerPosition = useGameStore((state) => state.playerPosition);
   const interactionPrompt = useGameStore((state) => state.interactionPrompt);
   const notification = useGameStore((state) => state.notification);
   const isLocked = useGameStore((state) => state.isLocked);
   const cameraMode = useGameStore((state) => state.cameraMode);
+  const buildingMode = useGameStore((state) => state.buildingMode);
+  const setBuildingMode = useGameStore((state) => state.setBuildingMode);
 
   // Auto-dismiss notification after 3.5 seconds
   const setNotification = useGameStore((state) => state.setNotification);
@@ -40,6 +50,22 @@ export const GameHUD: React.FC = () => {
               <div className="text-xl font-bold tracking-wide text-white glow-text">
                 FLOOR {currentFloor}
               </div>
+              <div className="flex items-center gap-2 mt-1">
+                <button
+                  type="button"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    const newMode = buildingMode === 'reconstructed' ? 'procedural' : 'reconstructed';
+                    setBuildingMode(newMode);
+                    setNotification(`Switched environment to ${newMode === 'reconstructed' ? 'REAL DIGITAL TWIN' : 'PROCEDURAL BUILDING'}`);
+                  }}
+                  title="Click to toggle between Reconstructed Digital Twin and Procedural Building"
+                  className="pointer-events-auto text-[10px] tracking-wider uppercase font-bold px-2.5 py-1 rounded bg-cyan-950/90 hover:bg-cyan-900 border border-cyan-500/40 text-cyan-300 transition-all cursor-pointer flex items-center gap-1.5 shadow-sm"
+                >
+                  <span className={`w-2 h-2 rounded-full ${buildingMode === 'reconstructed' ? 'bg-emerald-400 animate-pulse' : 'bg-amber-400'}`}></span>
+                  {buildingMode === 'reconstructed' ? '● REAL DIGITAL TWIN' : '● PROCEDURAL TEST'}
+                </button>
+              </div>
             </div>
           </div>
 
@@ -58,21 +84,26 @@ export const GameHUD: React.FC = () => {
           </div>
         )}
 
-        {/* Top-Right: Coordinates & Telemetry */}
-        <div className="glass-panel px-5 py-3 flex items-center gap-3 border-r-4 border-r-blue-500">
-          <div className="text-right">
-            <div className="text-xs tracking-widest uppercase text-slate-400 font-semibold flex items-center justify-end gap-1">
-              <Compass size={13} className="text-blue-400" /> Player Position
+        {/* Top-Right: Coordinates & Telemetry + 2D Minimap */}
+        <div className="flex flex-col gap-3 items-end pointer-events-auto">
+          <div className="glass-panel px-5 py-3 flex items-center gap-3 border-r-4 border-r-blue-500">
+            <div className="text-right">
+              <div className="text-xs tracking-widest uppercase text-slate-400 font-semibold flex items-center justify-end gap-1">
+                <Compass size={13} className="text-blue-400" /> Player Position
+              </div>
+              <div className="mono text-sm font-semibold tracking-wider text-slate-200 mt-0.5">
+                X: <span className="text-cyan-400">{playerPosition.x.toFixed(1)}</span>{' '}
+                Y: <span className="text-cyan-400">{playerPosition.y.toFixed(1)}</span>{' '}
+                Z: <span className="text-cyan-400">{playerPosition.z.toFixed(1)}</span>
+              </div>
             </div>
-            <div className="mono text-sm font-semibold tracking-wider text-slate-200 mt-0.5">
-              X: <span className="text-cyan-400">{playerPosition.x.toFixed(1)}</span>{' '}
-              Y: <span className="text-cyan-400">{playerPosition.y.toFixed(1)}</span>{' '}
-              Z: <span className="text-cyan-400">{playerPosition.z.toFixed(1)}</span>
+            <div className="text-xs font-bold px-2 py-1 rounded bg-slate-800 text-cyan-400 uppercase tracking-wider">
+              {cameraMode}
             </div>
           </div>
-          <div className="text-xs font-bold px-2 py-1 rounded bg-slate-800 text-cyan-400 uppercase tracking-wider">
-            {cameraMode}
-          </div>
+
+          {/* 2D Minimap Radar */}
+          <Minimap />
         </div>
       </div>
 
@@ -132,24 +163,41 @@ export const GameHUD: React.FC = () => {
               <span className="px-1.5 py-0.5 rounded bg-slate-800 border border-slate-700 font-bold text-white">V</span>
               <span className="text-slate-400">FPS/TPS</span>
             </div>
+            <div className="flex items-center gap-2">
+              <span className="px-1.5 py-0.5 rounded bg-slate-800 border border-slate-700 font-bold text-white">B</span>
+              <span className="text-slate-400">Debug</span>
+            </div>
           </div>
         </div>
 
-        {/* Bottom-Right: Project Badge */}
-        <div className="glass-panel px-4 py-2.5 text-right">
-          <div className="text-[10px] uppercase font-bold tracking-widest text-cyan-400">
-            Namma Space • Techfest
-          </div>
-          <div className="text-xs font-semibold text-slate-300">
-            PARKAR Indoor Twin v0.1
+        {/* Bottom-Right: PARKAR AI Chat Drawer + Project Badge */}
+        <div className="flex flex-col items-end gap-3 pointer-events-auto">
+          <ParkarChatDrawer />
+          <div className="glass-panel px-4 py-2 text-right">
+            <div className="text-[10px] uppercase font-bold tracking-widest text-cyan-400">
+              Namma Space • Techfest
+            </div>
+            <div className="text-xs font-semibold text-slate-300">
+              PARKAR Indoor Twin v0.2
+            </div>
           </div>
         </div>
       </div>
 
-      {/* 5. POINTER LOCK START OVERLAY (When user hasn't clicked canvas) */}
-      {!isLocked && (
-        <div className="absolute inset-0 bg-black/60 backdrop-blur-sm pointer-events-auto flex items-center justify-center">
-          <div className="glass-panel p-8 max-w-md text-center flex flex-col items-center border-cyan-500/40 shadow-2xl">
+      {/* 5. INITIAL START OVERLAY (Welcome modal before user starts) */}
+      {!hasStarted && (
+        <div 
+          onClick={(e) => {
+            e.stopPropagation();
+            startGame();
+            onPlay?.();
+          }}
+          className="absolute inset-0 bg-black/75 backdrop-blur-md pointer-events-auto flex items-center justify-center z-50 transition-all"
+        >
+          <div 
+            onClick={(e) => e.stopPropagation()}
+            className="glass-panel p-8 max-w-md text-center flex flex-col items-center border-cyan-500/40 shadow-2xl relative"
+          >
             <div className="w-16 h-16 rounded-2xl bg-cyan-500/10 border border-cyan-400/30 flex items-center justify-center text-cyan-400 mb-4 animate-pulse">
               <Eye size={32} />
             </div>
@@ -160,15 +208,37 @@ export const GameHUD: React.FC = () => {
               AI-Powered Indoor Spatial Guide • IIT Bombay
             </p>
             <p className="text-sm text-slate-300 mb-6 leading-relaxed">
-              Explore the reconstructed 3-floor building. Climb the staircase to reach Floors 2 and 3, inspect rooms, and test interactive zones.
+              Explore the reconstructed 3-floor building. Climb stairs or use elevators, navigate to rooms, and interact with the PARKAR AI assistant.
             </p>
-            <div className="px-6 py-3 rounded-xl bg-gradient-to-r from-cyan-500 to-blue-600 text-black font-extrabold text-sm uppercase tracking-wider cursor-pointer hover:opacity-90 transition-all transform hover:scale-105 shadow-lg shadow-cyan-500/30 flex items-center gap-2">
+            <button
+              type="button"
+              id="play-button"
+              onClick={(e) => {
+                e.stopPropagation();
+                startGame();
+                onPlay?.();
+              }}
+              className="px-6 py-3.5 rounded-xl bg-gradient-to-r from-cyan-500 to-blue-600 text-black font-extrabold text-sm uppercase tracking-wider cursor-pointer hover:opacity-95 transition-all transform hover:scale-105 active:scale-95 shadow-lg shadow-cyan-500/30 flex items-center gap-2 outline-none focus:ring-2 focus:ring-cyan-400"
+            >
               <Footprints size={18} /> Click Anywhere to Play
-            </div>
-            <div className="text-xs text-slate-400 mt-4">
-              Press <kbd className="px-1.5 py-0.5 rounded bg-slate-800 border border-slate-700 text-white font-mono">ESC</kbd> anytime to release mouse cursor
+            </button>
+            <div className="text-xs text-slate-400 mt-4 flex items-center gap-1.5">
+              <span>Press</span>
+              <kbd className="px-1.5 py-0.5 rounded bg-slate-800 border border-slate-700 text-white font-mono">ESC</kbd>
+              <span>anytime to release mouse cursor for UI</span>
             </div>
           </div>
+        </div>
+      )}
+
+      {/* 6. UNLOCKED MOUSE LOOK RESUME HINT (Non-blocking pill when cursor is unlocked) */}
+      {hasStarted && !isLocked && (
+        <div 
+          onClick={onPlay}
+          className="absolute top-20 left-1/2 -translate-x-1/2 pointer-events-auto cursor-pointer glass-panel px-4 py-1.5 border-cyan-400/40 bg-slate-950/85 text-cyan-300 text-xs font-semibold tracking-wider flex items-center gap-2 rounded-full hover:border-cyan-300 hover:text-white transition-all shadow-lg animate-fade-in z-20"
+        >
+          <Footprints size={14} className="text-cyan-400" />
+          Click to resume mouse look • ESC to release cursor
         </div>
       )}
     </div>

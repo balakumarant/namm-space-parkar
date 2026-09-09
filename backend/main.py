@@ -5,8 +5,7 @@ from typing import List, Optional
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
-from config import settings
-from core.pathfinding import pathfinder, RouteCalculationResponse
+from core.pathfinding import pathfinder, RouteCalculationResponse, get_routes_for_mode
 
 app = FastAPI(
     title=settings.app_name,
@@ -94,25 +93,68 @@ class RouteRequest(BaseModel):
     start_z: float
     destination_id: str
     start_floor: Optional[int] = None
+    building_mode: Optional[str] = "procedural"
 
 @app.get("/api/navigation/graph")
-def get_spatial_graph():
-    return load_json_file("spatial_graph.json")
+def get_spatial_graph(mode: Optional[str] = "procedural"):
+    filename = "reconstructed_spatial_graph.json" if mode == "reconstructed" else "spatial_graph.json"
+    return load_json_file(filename)
 
 @app.post("/api/navigation/route", response_model=RouteCalculationResponse)
 def calculate_route(req: RouteRequest):
     try:
-        return pathfinder.get_multi_routes(
+        return get_routes_for_mode(
             start_x=req.start_x,
             start_y=req.start_y,
             start_z=req.start_z,
-            dest_node_id=req.destination_id,
-            start_floor=req.start_floor
+            dest_id=req.destination_id,
+            start_floor=req.start_floor,
+            mode=req.building_mode or "procedural"
         )
     except ValueError as e:
         raise HTTPException(status_code=404, detail=str(e))
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Pathfinding error: {str(e)}")
+from ai.parkar_agent import parkar_agent
+
+class PlayerState(BaseModel):
+    x: float = 0.0
+    y: float = 0.5
+    z: float = 24.0
+    floor: int = 1
+
+class ChatMessage(BaseModel):
+    role: str
+    content: str
+
+class ParkarChatRequest(BaseModel):
+    message: str
+    player_state: Optional[PlayerState] = None
+    history: Optional[List[ChatMessage]] = None
+    building_mode: Optional[str] = "procedural"
+
+@app.get("/api/parkar/status")
+def get_ai_status():
+    has_gemini = bool(settings.gemini_api_key and settings.gemini_api_key != "your_gemini_api_key_here")
+    return {
+        "status": "online",
+        "agent": "PARKAR Spatial Assistant",
+        "gemini_enabled": has_gemini,
+        "mode": "gemini-2.5-flash" if has_gemini else "deterministic-grounded-nlp"
+    }
+
+@app.post("/api/parkar/chat")
+def parkar_chat(req: ParkarChatRequest):
+    ps = req.player_state or PlayerState()
+    history_dicts = [h.dict() for h in req.history] if req.history else []
+    
+    return parkar_agent.process_message(
+        message=req.message,
+        player_x=ps.x,
+        player_y=ps.y,
+        player_z=ps.z,
+        player_floor=ps.floor,
+        history=history_dicts,
+        building_mode=req.building_mode or "procedural"
+    )
 
 if __name__ == "__main__":
     import uvicorn

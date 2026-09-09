@@ -1,0 +1,154 @@
+{
+  "building": "IIT Bombay Reconstructed Digital Twin",
+  "floor": 1,
+  "nodes": [
+    {
+      "id": "rec_n_entrance",
+      "name": "Main South Entrance",
+      "floor": 1,
+      "type": "entrance",
+      "x": 0.0,
+      "y": 0.0,
+      "z": 4.5,
+      "accessible": true
+    },
+    {
+      "id": "rec_n_stairs",
+      "name": "Grand Foyer Staircase",
+      "floor": 1,
+      "type": "stair_landing",
+      "x": 1.5,
+      "y": 0.0,
+      "z": 5.2,
+      "accessible": true
+    },
+    {
+      "id": "rec_n_corridor_s",
+      "name": "South Corridor",
+      "floor": 1,
+      "type": "corridor",
+      "x": 0.0,
+      "y": 0.0,
+      "z": 10.0,
+      "accessible": true
+    },
+    {
+      "id": "rec_n_c_mid",
+      "name": "Central Gallery Concourse",
+      "floor": 1,
+      "type": "corridor",
+      "x": 0.0,
+      "y": 0.0,
+      "z": 20.0,
+      "accessible": true
+    },
+    {
+      "id": "rec_n_c_junc_101",
+      "name": "Room 101 Hallway Junction",
+      "floor": 1,
+      "type": "corridor",
+      "x": 0.0,
+      "y": 0.0,
+      "z": 28.0,
+      "accessible": true
+    },
+    {
+      "id": "rec_n_door_101",
+      "name": "Room 101 Entryway",
+      "floor": 1,
+      "type": "room_door",
+      "x": -2.0,
+      "y": 0.0,
+      "z": 28.0,
+      "accessible": true
+    },
+    {
+      "id": "rec_n_room_101",
+      "name": "Room 101 - Techfest Robotics Wing",
+      "floor": 1,
+      "type": "room_inside",
+      "x": -5.5,
+      "y": 0.0,
+      "z": 28.0,
+      "accessible": true
+    },
+    {
+      "id": "rec_n_c_north_junc",
+      "name": "North Hallway Concourse",
+      "floor": 1,
+      "type": "corridor",
+      "x": 0.0,
+      "y": 0.0,
+      "z": 38.0,
+      "accessible": true
+    },
+    {
+      "id": "rec_n_lounge",
+      "name": "Executive Lounge & Seminar Arena",
+      "floor": 1,
+      "type": "room_inside",
+      "x": 0.0,
+      "y": 0.0,
+      "z": 48.0,
+      "accessible": true
+    }
+  ],
+  "edges": [
+    {
+      "from": "rec_n_entrance",
+      "to": "rec_n_stairs",
+      "weight": 1.7,
+      "type": "flat",
+      "accessible": true
+    },
+    {
+      "from": "rec_n_entrance",
+      "to": "rec_n_corridor_s",
+      "weight": 5.5,
+      "type": "flat",
+      "accessible": true
+    },
+    {
+      "from": "rec_n_corridor_s",
+      "to": "rec_n_c_mid",
+      "weight": 10.0,
+      "type": "flat",
+      "accessible": true
+    },
+    {
+      "from": "rec_n_c_mid",
+      "to": "rec_n_c_junc_101",
+      "weight": 8.0,
+      "type": "flat",
+      "accessible": true
+    },
+    {
+      "from": "rec_n_c_junc_101",
+      "to": "rec_n_door_101",
+      "weight": 2.0,
+      "type": "flat",
+      "accessible": true
+    },
+    {
+      "from": "rec_n_door_101",
+      "to": "rec_n_room_101",
+      "weight": 3.5,
+      "type": "flat",
+      "accessible": true
+    },
+    {
+      "from": "rec_n_c_junc_101",
+      "to": "rec_n_c_north_junc",
+      "weight": 10.0,
+      "type": "flat",
+      "accessible": true
+    },
+    {
+      "from": "rec_n_c_north_junc",
+      "to": "rec_n_lounge",
+      "weight": 10.0,
+      "type": "flat",
+      "accessible": true
+    }
+  ]
+}

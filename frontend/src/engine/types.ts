@@ -44,4 +44,5 @@ export interface EngineCallbacks {
   onInteractionPrompt: (prompt: string | null, zone: InteractiveZone | null) => void;
   onNotification: (message: string) => void;
   onLockStateChange: (isLocked: boolean) => void;
+  onToggleDebug?: () => boolean;
 }

@@ -1,0 +1,47 @@
+{
+  "pipeline_name": "PARKAR Indoor 3D Reconstruction Pipeline",
+  "version": "1.0.0",
+  "recommended_capture": {
+    "resolution": "1920x1080 (1080p) or 3840x2160 (4K)",
+    "framerate": "30fps or 60fps",
+    "walking_speed": "0.3 - 0.5 m/s (slow, steady heel-to-toe walking)",
+    "lighting": "Even, diffuse indoor lighting; avoid strong backlighting or direct sun glare",
+    "motion": "Forward translation with slight serpentine curves; avoid rapid camera pans or rotations",
+    "overlap": "70% to 80% visual overlap between successive frames",
+    "loop_closure": "End the video by revisiting the starting landmark to ensure loop closure in SfM"
+  },
+  "frame_extraction": {
+    "target_fps": 2.0,
+    "max_frames": 150,
+    "min_sharpness_variance": 50.0,
+    "resize_width": 1280,
+    "resize_height": 720,
+    "format": "jpg",
+    "quality": 95
+  },
+  "reconstruction": {
+    "engine": "open3d-photogrammetry",
+    "fallback_engine": "deterministic-indoor-mesher",
+    "colmap_dense_stereo": false,
+    "feature_detector": "ORB",
+    "max_features": 3000,
+    "poisson_depth": 9,
+    "point_weight": 4.0
+  },
+  "mesh_optimization": {
+    "target_max_faces": 45000,
+    "remove_unreferenced_vertices": true,
+    "repair_non_manifold": true,
+    "unit_scale": "meters",
+    "reference_scale_factor": 1.0,
+    "export_format": "glb"
+  },
+  "paths": {
+    "input_video": "reconstruction/input/indoor_building.mp4",
+    "extracted_frames_dir": "reconstruction/frames",
+    "output_dir": "reconstruction/output",
+    "output_glb": "reconstruction/output/building.glb",
+    "output_metadata": "reconstruction/output/metadata.json",
+    "semantic_metadata": "reconstruction/semantic/building_metadata.json"
+  }
+}

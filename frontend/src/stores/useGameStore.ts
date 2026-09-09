@@ -1,14 +1,23 @@
 import { create } from 'zustand';
 import { CameraMode, Vector3Tuple } from '../engine/types';
 import { RouteOption } from '../services/pathfinding';
+import { BUILDING_CONFIG, BuildingMode, getInitialBuildingMode } from '../config/buildingConfig';
+import { isPointOffRoute, computeReconstructedRoutes } from '../services/reconstructedGraphAdapter';
+
+const initialMode = getInitialBuildingMode();
+const initialSpawn = initialMode === 'reconstructed' 
+  ? BUILDING_CONFIG.reconstructedSpawn 
+  : BUILDING_CONFIG.proceduralSpawn;
 
 interface GameState {
+  hasStarted: boolean;
   currentFloor: number;
   playerPosition: Vector3Tuple;
   interactionPrompt: string | null;
   notification: string | null;
   isLocked: boolean;
   cameraMode: CameraMode;
+  buildingMode: BuildingMode;
 
   // Navigation state
   availableRoutes: RouteOption[];
@@ -17,9 +26,13 @@ interface GameState {
   targetPOI: string | null;
   targetPOIName: string | null;
   isNavigating: boolean;
+  hasArrived: boolean;
+  isOffRoute: boolean;
   currentStepIndex: number;
   currentInstruction: string | null;
 
+  startGame: () => void;
+  setBuildingMode: (mode: BuildingMode) => void;
   setPlayerMove: (pos: Vector3Tuple, floor: number) => void;
   setFloor: (floor: number) => void;
   setInteractionPrompt: (prompt: string | null) => void;
@@ -35,12 +48,14 @@ interface GameState {
 }
 
 export const useGameStore = create<GameState>((set) => ({
+  hasStarted: false,
   currentFloor: 1,
-  playerPosition: { x: 0, y: 1.0, z: 22.0 },
+  playerPosition: { ...initialSpawn },
   interactionPrompt: null,
   notification: null,
   isLocked: false,
   cameraMode: 'fps',
+  buildingMode: initialMode,
 
   availableRoutes: [],
   activeRoute: null,
@@ -48,17 +63,68 @@ export const useGameStore = create<GameState>((set) => ({
   targetPOI: null,
   targetPOIName: null,
   isNavigating: false,
+  hasArrived: false,
+  isOffRoute: false,
   currentStepIndex: 0,
   currentInstruction: null,
+
+  startGame: () => set({ hasStarted: true }),
+  setBuildingMode: (mode) => set({ buildingMode: mode }),
 
   setPlayerMove: (pos, floor) =>
     set((state) => {
       let newStepIndex = state.currentStepIndex;
       let newInstruction = state.currentInstruction;
+      let isNav = state.isNavigating;
+      let hasArr = state.hasArrived;
+      let activeR = state.activeRoute;
+      let availR = state.availableRoutes;
+      let notif = state.notification;
 
-      // If actively navigating, check distance to upcoming waypoints
-      if (state.isNavigating && state.activeRoute && state.activeRoute.waypoints.length > 0) {
-        const waypoints = state.activeRoute.waypoints;
+      if (isNav && activeR && activeR.waypoints.length > 0) {
+        const waypoints = activeR.waypoints;
+        const destWp = waypoints[waypoints.length - 1];
+        const distToDest = Math.sqrt((pos.x - destWp.x) ** 2 + (pos.z - destWp.z) ** 2);
+
+        // 1. Arrival Detection (< 2.5m from destination)
+        if (distToDest < 2.5 && !hasArr) {
+          const arrivalMsg = `We've arrived at ${state.targetPOIName || 'your destination'}.`;
+          return {
+            playerPosition: pos,
+            currentFloor: state.currentFloor !== floor ? floor : state.currentFloor,
+            isNavigating: false,
+            hasArrived: true,
+            isOffRoute: false,
+            currentInstruction: `ARRIVED: ${arrivalMsg}`,
+            notification: arrivalMsg,
+          };
+        }
+
+        // 2. Off-Route Detection & Dynamic Recalculation (> 4.0m from route)
+        if (!hasArr && isPointOffRoute(pos, waypoints, 4.0)) {
+          if (state.buildingMode === 'reconstructed' && state.targetPOI) {
+            try {
+              const resp = computeReconstructedRoutes(pos.x, pos.y, pos.z, state.targetPOI);
+              const recalculated = resp.routes.find((r) => r.profile === state.selectedProfile) || resp.routes[0];
+              if (recalculated) {
+                return {
+                  playerPosition: pos,
+                  currentFloor: state.currentFloor !== floor ? floor : state.currentFloor,
+                  activeRoute: recalculated,
+                  availableRoutes: resp.routes,
+                  currentStepIndex: 0,
+                  currentInstruction: recalculated.instructions[0] || null,
+                  isOffRoute: false,
+                  notification: `OFF ROUTE: Recalculated route to ${state.targetPOIName}`,
+                };
+              }
+            } catch (e) {
+              console.warn('Reconstructed route recalculation error:', e);
+            }
+          }
+        }
+
+        // 3. Step Progression (< 2.5m from upcoming waypoint)
         const currentTargetWp = waypoints[newStepIndex];
         if (currentTargetWp) {
           const dx = pos.x - currentTargetWp.x;
@@ -66,10 +132,9 @@ export const useGameStore = create<GameState>((set) => ({
           const dz = pos.z - currentTargetWp.z;
           const distToWp = Math.sqrt(dx * dx + dy * dy + dz * dz);
 
-          // If within 2.5m of waypoint, advance instruction
-          if (distToWp < 2.5 && newStepIndex < state.activeRoute.instructions.length - 1) {
+          if (distToWp < 2.5 && newStepIndex < activeR.instructions.length - 1) {
             newStepIndex += 1;
-            newInstruction = state.activeRoute.instructions[newStepIndex] || state.currentInstruction;
+            newInstruction = activeR.instructions[newStepIndex] || state.currentInstruction;
           }
         }
       }
@@ -79,6 +144,11 @@ export const useGameStore = create<GameState>((set) => ({
         currentFloor: state.currentFloor !== floor ? floor : state.currentFloor,
         currentStepIndex: newStepIndex,
         currentInstruction: newInstruction,
+        isNavigating: isNav,
+        hasArrived: hasArr,
+        activeRoute: activeR,
+        availableRoutes: availR,
+        notification: notif,
       };
     }),
 

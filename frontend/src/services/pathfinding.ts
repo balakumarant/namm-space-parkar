@@ -1,4 +1,5 @@
 import spatialGraphData from '../data/spatial_graph.json';
+import { computeReconstructedRoutes } from './reconstructedGraphAdapter';
 
 export interface SpatialNode {
   id: string;
@@ -115,7 +116,8 @@ export class ClientPathfinder {
     startY: number,
     startZ: number,
     destinationId: string,
-    currentFloor?: number
+    currentFloor?: number,
+    mode: 'procedural' | 'reconstructed' = 'procedural'
   ): Promise<RouteResponse> {
     try {
       const response = await fetch(`${API_BASE_URL}/api/navigation/route`, {
@@ -127,6 +129,7 @@ export class ClientPathfinder {
           start_z: startZ,
           destination_id: destinationId,
           start_floor: currentFloor,
+          building_mode: mode,
         }),
       });
 
@@ -138,6 +141,10 @@ export class ClientPathfinder {
     }
 
     // Client-side fallback solver
+    if (mode === 'reconstructed' || destinationId.startsWith('rec_') || ['f1_entrance', 'f1_stairs', 'f1_c_mid', 'room_101', 'f1_c_north'].includes(destinationId)) {
+      return computeReconstructedRoutes(startX, startY, startZ, destinationId);
+    }
+
     return this.computeClientRoutes(startX, startY, startZ, destinationId, currentFloor);
   }
 

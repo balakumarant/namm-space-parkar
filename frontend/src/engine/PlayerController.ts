@@ -38,19 +38,28 @@ export class PlayerController {
   // Interactive zones tracking
   private interactiveZones: InteractiveZone[] = [];
   private currentActiveZone: InteractiveZone | null = null;
+  private spawnPosition: Vector3Tuple = { x: 0, y: 1.0, z: 22 };
 
   constructor(
     camera: THREE.PerspectiveCamera,
     scene: THREE.Scene,
     physics: PhysicsWorld,
     domElement: HTMLElement,
-    callbacks: EngineCallbacks
+    callbacks: EngineCallbacks,
+    initialSpawn?: Vector3Tuple,
+    initialYaw?: number
   ) {
     this.camera = camera;
     this.scene = scene;
     this.physics = physics;
     this.domElement = domElement;
     this.callbacks = callbacks;
+    if (initialSpawn) {
+      this.spawnPosition = { ...initialSpawn };
+    }
+    if (initialYaw !== undefined) {
+      this.yaw = initialYaw;
+    }
 
     this.initAvatar();
     this.initPhysics();
@@ -81,10 +90,7 @@ export class PlayerController {
   }
 
   private initPhysics(): void {
-    // Start player at Floor 1 entrance: x = 0, y = 0.5, z = 22
-    const startX = 0;
-    const startY = 1.0;
-    const startZ = 22;
+    const { x: startX, y: startY, z: startZ } = this.spawnPosition;
 
     const playerPhysics = this.physics.createPlayerCapsule(startX, startY, startZ, 0.38, 0.55);
     if (playerPhysics) {
@@ -103,12 +109,24 @@ export class PlayerController {
     // Pointer lock & mouse look
     this.domElement.addEventListener('click', this.requestPointerLock);
     document.addEventListener('pointerlockchange', this.onPointerLockChange);
+    document.addEventListener('pointerlockerror', (e) => {
+      console.warn('Pointer lock error/cancelled:', e);
+    });
     window.addEventListener('mousemove', this.onMouseMove);
   }
 
-  private requestPointerLock = (): void => {
-    if (!this.isLocked) {
-      this.domElement.requestPointerLock();
+  public requestPointerLock = (): void => {
+    if (!this.isLocked && this.domElement) {
+      try {
+        const promise = this.domElement.requestPointerLock() as any;
+        if (promise && typeof promise.catch === 'function') {
+          promise.catch((err: any) => {
+            console.warn('Pointer lock request rejected or cancelled:', err);
+          });
+        }
+      } catch (err) {
+        console.warn('Pointer lock invocation failed:', err);
+      }
     }
   };
 
@@ -129,6 +147,12 @@ export class PlayerController {
   };
 
   private onKeyDown = (e: KeyboardEvent): void => {
+    // Avoid capturing WASD/E/V while typing in input or textarea
+    const target = e.target as HTMLElement;
+    if (target && (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA' || target.isContentEditable)) {
+      return;
+    }
+
     this.keys[e.code] = true;
 
     // Interaction key E
@@ -140,11 +164,41 @@ export class PlayerController {
     if (e.code === 'KeyV') {
       this.cameraMode = this.cameraMode === 'fps' ? 'tps' : 'fps';
     }
+
+    // Toggle Debug visualizer (B or F2 key)
+    if (e.code === 'KeyB' || e.code === 'F2') {
+      if (this.callbacks.onToggleDebug) {
+        const active = this.callbacks.onToggleDebug();
+        this.callbacks.onNotification(
+          `Debug visualizer: ${active ? 'ENABLED (wireframes active)' : 'DISABLED'}`
+        );
+      }
+    }
   };
 
   private onKeyUp = (e: KeyboardEvent): void => {
     this.keys[e.code] = false;
   };
+
+  public respawn(pos?: Vector3Tuple, yaw?: number): void {
+    if (pos) {
+      this.spawnPosition = { ...pos };
+    }
+    if (yaw !== undefined) {
+      this.yaw = yaw;
+      this.pitch = 0;
+    }
+    if (this.body) {
+      this.body.setTranslation(
+        new RAPIER.Vector3(this.spawnPosition.x, this.spawnPosition.y, this.spawnPosition.z),
+        true
+      );
+    }
+    this.verticalVelocity = 0;
+    this.isGrounded = true;
+    this.camera.position.set(this.spawnPosition.x, this.spawnPosition.y + this.eyeHeight, this.spawnPosition.z);
+    this.avatarMesh.position.set(this.spawnPosition.x, this.spawnPosition.y, this.spawnPosition.z);
+  }
 
   private triggerInteraction(): void {
     if (this.currentActiveZone) {

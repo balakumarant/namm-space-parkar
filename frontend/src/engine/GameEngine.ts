@@ -4,8 +4,10 @@ import { PhysicsWorld } from './PhysicsWorld';
 import { BuildingLoader } from './BuildingLoader';
 import { PlayerController } from './PlayerController';
 import { RouteVisualizer } from './RouteVisualizer';
+import { DebugVisualizer } from './DebugVisualizer';
 import { Waypoint } from '../services/pathfinding';
 import { EngineCallbacks } from './types';
+import { BuildingMode } from '../config/buildingConfig';
 
 export class GameEngine {
   public sceneManager: SceneManager;
@@ -13,6 +15,7 @@ export class GameEngine {
   public buildingLoader: BuildingLoader;
   public playerController: PlayerController | null = null;
   public routeVisualizer: RouteVisualizer;
+  public debugVisualizer: DebugVisualizer;
 
   private clock: THREE.Clock = new THREE.Clock();
   private isRunning: boolean = false;
@@ -25,6 +28,7 @@ export class GameEngine {
     this.physicsWorld = new PhysicsWorld();
     this.buildingLoader = new BuildingLoader();
     this.routeVisualizer = new RouteVisualizer(this.sceneManager.scene);
+    this.debugVisualizer = new DebugVisualizer(this.sceneManager.scene);
   }
 
   public async init(): Promise<void> {
@@ -32,15 +36,25 @@ export class GameEngine {
     await this.physicsWorld.init();
 
     // 2. Build 3D Building Geometry and static colliders
-    await this.buildingLoader.build(this.sceneManager.scene, this.physicsWorld);
+    await this.buildingLoader.build(this.sceneManager.scene, this.physicsWorld, this.debugVisualizer);
 
-    // 3. Initialize Player Avatar & Controller
+    // 3. Initialize Player Avatar & Controller at calibrated spawn point
+    const spawnPos = this.buildingLoader.getSpawnPosition();
+    const spawnYaw = this.buildingLoader.getSpawnYaw();
+
+    const mergedCallbacks: EngineCallbacks = {
+      ...this.callbacks,
+      onToggleDebug: () => this.debugVisualizer.toggle(),
+    };
+
     this.playerController = new PlayerController(
       this.sceneManager.camera,
       this.sceneManager.scene,
       this.physicsWorld,
       this.sceneManager.renderer.domElement,
-      this.callbacks
+      mergedCallbacks,
+      spawnPos,
+      spawnYaw
     );
 
     // Register interactive zones with player controller
@@ -87,6 +101,12 @@ export class GameEngine {
     this.routeVisualizer.clearRoute();
   }
 
+  public requestPointerLock(): void {
+    if (this.playerController) {
+      this.playerController.requestPointerLock();
+    }
+  }
+
   public stop(): void {
     this.isRunning = false;
     if (this.animationFrameId !== null) {
@@ -95,8 +115,22 @@ export class GameEngine {
     }
   }
 
+  public async switchBuildingMode(mode: BuildingMode): Promise<void> {
+    if (this.buildingLoader.getMode() === mode) return;
+    this.buildingLoader.setMode(mode);
+    await this.buildingLoader.build(this.sceneManager.scene, this.physicsWorld, this.debugVisualizer);
+
+    if (this.playerController) {
+      this.playerController.setInteractiveZones(this.buildingLoader.getInteractiveZones());
+      const newSpawn = this.buildingLoader.getSpawnPosition();
+      const newYaw = this.buildingLoader.getSpawnYaw();
+      this.playerController.respawn(newSpawn, newYaw);
+    }
+  }
+
   public dispose(): void {
     this.stop();
+    this.debugVisualizer.dispose();
     this.routeVisualizer.dispose();
     if (this.playerController) {
       this.playerController.dispose();

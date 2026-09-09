@@ -1,0 +1,86 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "building": {
+    "id": "rec_building_main",
+    "name": "Namma Space - Real-World Reconstructed Digital Twin",
+    "campus": "Techfest, IIT Bombay",
+    "capture_source": "Smartphone 1080p60 Video (indoor_building.mp4)",
+    "units": "meters",
+    "coordinate_system": "Three.js / WebGL (Y-up, right-handed, 1 unit = 1.0 meter)",
+    "scale_calibrated": true,
+    "calibration_reference": "Standard door frame height = 2.10 meters"
+  },
+  "dimensions": {
+    "width_meters": 18.0,
+    "height_meters": 4.5,
+    "length_meters": 40.0
+  },
+  "floors": [
+    {
+      "floor_number": 1,
+      "name": "Ground Level",
+      "elevation": 0.0,
+      "height": 4.5,
+      "corridor": {
+        "start": [0.0, 0.0, 18.0],
+        "end": [0.0, 0.0, -18.0],
+        "width": 4.0
+      },
+      "walkable_bounds": {
+        "min_x": -8.5,
+        "max_x": 8.5,
+        "min_z": -19.0,
+        "max_z": 19.0
+      }
+    }
+  ],
+  "rooms": [
+    {
+      "id": "rec_room_101",
+      "number": "101",
+      "name": "Room 101 - Reconstructed Robotics Lab",
+      "floor": 1,
+      "category": "laboratory",
+      "center": { "x": -5.5, "y": 0.0, "z": -8.0 },
+      "size": { "x": 6.0, "y": 4.0, "z": 8.0 },
+      "door": { "x": -2.0, "y": 0.0, "z": -8.0 },
+      "verified_by_human": true
+    },
+    {
+      "id": "rec_room_102",
+      "number": "102",
+      "name": "Room 102 - Reconstructed Hardware Lab",
+      "floor": 1,
+      "category": "laboratory",
+      "center": { "x": -5.5, "y": 0.0, "z": 4.0 },
+      "size": { "x": 6.0, "y": 4.0, "z": 8.0 },
+      "door": { "x": -2.0, "y": 0.0, "z": 4.0 },
+      "verified_by_human": true
+    }
+  ],
+  "vertical_connectors": [
+    {
+      "id": "rec_connector_elevator_a",
+      "type": "elevator",
+      "name": "Elevator A (North Lobby)",
+      "position": { "x": 0.0, "y": 0.0, "z": -16.0 },
+      "accessible": true
+    },
+    {
+      "id": "rec_connector_stairs_a",
+      "type": "stairs",
+      "name": "Staircase A (South Wing)",
+      "position": { "x": 4.5, "y": 0.0, "z": 14.0 },
+      "accessible": false
+    }
+  ],
+  "navigation_seed_waypoints": [
+    { "id": "rec_wp_entrance", "coords": [0.0, 0.5, 17.0], "label": "South Entrance" },
+    { "id": "rec_wp_c1", "coords": [0.0, 0.5, 8.0], "label": "Mid-South Corridor" },
+    { "id": "rec_wp_r102_door", "coords": [-2.0, 0.5, 4.0], "label": "Room 102 Entrance" },
+    { "id": "rec_wp_c2", "coords": [0.0, 0.5, 0.0], "label": "Central Hall Waypoint" },
+    { "id": "rec_wp_c3", "coords": [0.0, 0.5, -8.0], "label": "Mid-North Corridor" },
+    { "id": "rec_wp_r101_door", "coords": [-2.0, 0.5, -8.0], "label": "Room 101 Entrance" },
+    { "id": "rec_wp_elevator", "coords": [0.0, 0.5, -16.0], "label": "Elevator A Lobby" }
+  ]
+}
