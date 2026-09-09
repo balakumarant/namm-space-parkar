@@ -5,6 +5,7 @@ from typing import List, Optional
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
+from config import settings
 from core.pathfinding import pathfinder, RouteCalculationResponse, get_routes_for_mode
 
 app = FastAPI(
