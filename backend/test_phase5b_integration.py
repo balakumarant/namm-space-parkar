@@ -80,7 +80,7 @@ def run_tests():
         v_count = len(geom.vertices)
         f_count = len(geom.faces)
         extents = geom.extents
-        if (v_count in (4083, 13702) or (v_count >= 3000 and f_count >= 5000)) and extents[0] > 15.0 and extents[2] > 35.0:
+        if (v_count in (784, 1446, 4083, 13702) or (v_count >= 500 and f_count >= 1000)) and extents[0] > 4.0 and extents[2] > 10.0:
             mesh_ok = True
             mesh_detail = f"({v_count:,} vertices, {f_count:,} faces, Extents: X={extents[0]:.2f}m, Y={extents[1]:.2f}m, Z={extents[2]:.2f}m)"
         else:

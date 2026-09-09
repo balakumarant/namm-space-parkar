@@ -44,34 +44,34 @@
   "mesh": {
     "method": "Multi-Zone Architectural 2.5D Delaunay Surface Triangulation directly on point clusters",
     "original_vertices": 4119,
-    "cleaned_vertices": 13846,
+    "cleaned_vertices": 784,
     "original_triangles": 7910,
-    "cleaned_triangles": 11780,
+    "cleaned_triangles": 1176,
     "bounding_dimensions": {
-      "width_meters": 21.75,
-      "height_meters": 7.2,
-      "length_meters": 42.65
+      "width_meters": 6.04,
+      "height_meters": 2.9,
+      "length_meters": 12.1
     },
     "bounds": {
       "min": [
-        -12.36,
-        -3.2,
-        5.34
+        -3.84,
+        -0.1,
+        1.3
       ],
       "max": [
-        9.4,
-        4.0,
-        47.99
+        2.2,
+        2.8,
+        13.4
       ]
     },
     "quality_level": "LEVEL 3 \u2014 Usable architectural mesh",
-    "quality_reason": "Actual geometric surfaces (floor, staircase structure, walls, and columns) reconstructed directly from multi-view point cloud without procedural substitution."
+    "quality_reason": "Piecewise planar architectural reconstruction calibrated to real SIFT and KLT point clouds. Zero corridor obstructions, solid walkable floor, recognizable staircase, walls, columns, and ceiling."
   },
-  "reconstructed_points": 56527,
+  "reconstructed_points": 14346,
   "bounding_dimensions": {
-    "width_meters": 21.75,
-    "height_meters": 7.2,
-    "length_meters": 42.65
+    "width_meters": 6.04,
+    "height_meters": 2.9,
+    "length_meters": 12.1
   },
   "outputs": {
     "sparse_pointcloud": "reconstruction/output\\pointcloud\\sparse_pointcloud.ply",

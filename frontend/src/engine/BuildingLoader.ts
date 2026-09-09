@@ -435,49 +435,52 @@ export class BuildingLoader implements IBuildingLoader {
 
     // 3. Register separated Rapier physics colliders
     // Top surface of walkable floor at Y = 0.0m
-    // Bounds: X [-13.03, 10.37] (width 23.4m), Z [2.14, 54.37] (length 52.23m)
-    const floorCenterX = -1.33;
-    const floorCenterZ = 28.26;
-    const floorHalfW = 11.70;
-    const floorHalfL = 26.12;
+    // Calibrated bounds: X [-3.84, 2.20] (width 6.04m), Z [1.30, 13.40] (length 12.10m)
+    const floorCenterX = -0.82;
+    const floorCenterZ = 7.35;
+    const floorHalfW = 3.02;
+    const floorHalfL = 6.05;
 
     // Walkable floor slab (thickness 0.3m, top at Y = 0.0m)
     this.addStaticBox(floorCenterX, -0.15, floorCenterZ, floorHalfW, 0.15, floorHalfL, 0.6);
 
     // Outer boundary walls (prevent falling off or escaping the reconstructed building)
-    const wallH = 2.5;
-    this.addStaticBox(-13.1, wallH, floorCenterZ, 0.2, wallH, floorHalfL); // West wall
-    this.addStaticBox(10.4, wallH, floorCenterZ, 0.2, wallH, floorHalfL);  // East wall
-    this.addStaticBox(floorCenterX, wallH, 2.14, floorHalfW, wallH, 0.2); // South entrance back wall
-    this.addStaticBox(floorCenterX, wallH, 54.37, floorHalfW, wallH, 0.2); // North far end wall
+    const wallH = 1.45;
+    this.addStaticBox(-3.90, wallH, floorCenterZ, 0.2, wallH, floorHalfL); // West wall
+    this.addStaticBox(2.25, wallH, floorCenterZ, 0.2, wallH, floorHalfL);  // East wall
+    this.addStaticBox(floorCenterX, wallH, 1.25, floorHalfW, wallH, 0.2); // South entrance back wall
+    this.addStaticBox(floorCenterX, wallH, 13.45, floorHalfW, wallH, 0.2); // North far end wall
 
-    // Hallway corridor partitions at the entrance foyer (creating natural guided hallway)
-    this.addStaticBox(-1.3, 2.0, 4.75, 0.15, 2.0, 2.25); // West entrance partition
-    this.addStaticBox(1.9, 2.0, 4.25, 0.15, 2.0, 1.75);  // East entrance partition
+    // Hallway corridor partitions at the entrance foyer
+    this.addStaticBox(-1.60, wallH, 4.25, 0.15, wallH, 2.0); // West entrance partition
+    this.addStaticBox(1.90, wallH, 4.25, 0.15, wallH, 2.0);  // East entrance partition
 
-    // Foyer staircase incline & landing (staircase at X: 0.8 to 2.5, Z: 3.5 to 7.0)
-    this.addStaticIncline(1.65, 0.8, 5.25, 0.8, 0.15, 1.6, 0.44); // Incline ramp
-    this.addStaticBox(1.65, 1.6, 6.8, 0.8, 0.15, 0.5);            // Top landing
+    // Structural columns (at Z = 6.80m, X = -0.45m and +0.45m)
+    this.addStaticBox(-0.45, wallH, 6.80, 0.20, wallH, 0.20);
+    this.addStaticBox(0.45, wallH, 6.80, 0.20, wallH, 0.20);
 
-    // Major obstacles: Central fireplace column and dining table volume
-    this.addStaticBox(-1.5, 2.0, 22.0, 0.6, 2.0, 0.6);  // Central structural column / fireplace
-    this.addStaticBox(0.0, 0.45, 34.0, 1.2, 0.45, 1.8);  // Central dining table area
+    // Foyer staircase incline & landing (staircase at X: 1.0 to 2.0, Z: 2.4 to 6.2)
+    this.addStaticIncline(1.50, 0.7, 4.30, 0.50, 0.15, 1.9, 0.40); // Incline ramp
 
     // 4. Floating 3D Signage Badges for Reconstructed Areas
-    const signFoyer = this.createFloatingTextBadge('MAIN SOUTH ENTRANCE', 4.0, 1.0, 0x00f2fe);
-    signFoyer.position.set(0.0, 2.4, 4.5);
+    const signFoyer = this.createFloatingTextBadge('MAIN SOUTH ENTRANCE', 3.0, 0.8, 0x00f2fe);
+    signFoyer.position.set(0.0, 2.2, 2.8);
     this.buildingGroup.add(signFoyer);
 
-    const signStairs = this.createFloatingTextBadge('FOYER STAIRCASE', 3.5, 0.9, 0xf59e0b);
-    signStairs.position.set(1.65, 2.4, 5.25);
+    const signStairs = this.createFloatingTextBadge('FOYER STAIRCASE', 2.8, 0.7, 0xf59e0b);
+    signStairs.position.set(1.5, 2.2, 4.3);
     this.buildingGroup.add(signStairs);
 
-    const signLab = this.createFloatingTextBadge('ROOM 101 - ROBOTICS WING', 4.5, 1.0, 0x10b981);
-    signLab.position.set(-5.5, 2.4, 28.0);
-    this.buildingGroup.add(signLab);
+    const signColumns = this.createFloatingTextBadge('COLUMNS CONCOURSE', 3.2, 0.8, 0x10b981);
+    signColumns.position.set(0.0, 2.2, 6.8);
+    this.buildingGroup.add(signColumns);
 
-    const signLounge = this.createFloatingTextBadge('EXECUTIVE SEMINAR ARENA', 4.5, 1.0, 0x8b5cf6);
-    signLounge.position.set(0.0, 2.4, 48.0);
+    const signDining = this.createFloatingTextBadge('EAST DINING AREA', 2.8, 0.7, 0x3b82f6);
+    signDining.position.set(1.4, 2.2, 9.5);
+    this.buildingGroup.add(signDining);
+
+    const signLounge = this.createFloatingTextBadge('LIVING & FIREPLACE LOUNGE', 3.6, 0.8, 0xec4899);
+    signLounge.position.set(-2.2, 2.2, 10.8);
     this.buildingGroup.add(signLounge);
 
     // 5. Register interactive zones

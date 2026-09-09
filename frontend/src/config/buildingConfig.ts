@@ -1,4 +1,4 @@
-﻿import { Vector3Tuple } from '../engine/types';
+import { Vector3Tuple } from '../engine/types';
 
 export type BuildingMode = 'procedural' | 'reconstructed';
 
@@ -17,12 +17,12 @@ export const BUILDING_CONFIG: BuildingConfig = {
   glbUrl: '/models/building.glb',
   metadataUrl: '/models/metadata.json',
   // Calibrated spawn position inside the entrance hallway of the reconstructed building
-  // Width X [-1.14, 1.84], Length Z [2.14, 54.37], Floor aligned to Y = 0.0
+  // Width X [-1.6, 2.0], Length Z [1.5, 13.2], Floor aligned to Y = 0.0
   reconstructedSpawn: { x: 0.0, y: 1.0, z: 4.5 },
   // Procedural building spawn near Main South Entrance
   proceduralSpawn: { x: 0.0, y: 1.0, z: 22.0 },
-  // Vertical ground alignment offset: in raw photogrammetry, entrance floor is at Y = -1.70m
-  reconstructedOffset: { x: 0.0, y: 1.70, z: 0.0 },
+  // Vertical ground alignment offset: model floor is already at Y = 0.00m (calibrated from raw 1.7m)
+  reconstructedOffset: { x: 0.0, y: 0.0, z: 0.0 },
 };
 
 /**
