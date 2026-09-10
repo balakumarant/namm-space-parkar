@@ -19,6 +19,12 @@ interface GameState {
   cameraMode: CameraMode;
   buildingMode: BuildingMode;
 
+  // Custom Video Reconstruction State (Phase 6)
+  isUploadModalOpen: boolean;
+  customModelJobId: string | null;
+  customGlbUrl: string | null;
+  customMetadataUrl: string | null;
+
   // Navigation state
   availableRoutes: RouteOption[];
   activeRoute: RouteOption | null;
@@ -33,6 +39,8 @@ interface GameState {
 
   startGame: () => void;
   setBuildingMode: (mode: BuildingMode) => void;
+  setUploadModalOpen: (open: boolean) => void;
+  setCustomModel: (jobId: string | null, glbUrl: string | null, metadataUrl: string | null) => void;
   setPlayerMove: (pos: Vector3Tuple, floor: number) => void;
   setFloor: (floor: number) => void;
   setInteractionPrompt: (prompt: string | null) => void;
@@ -47,8 +55,14 @@ interface GameState {
   updateNavigationStep: (stepIndex: number) => void;
 }
 
+const isAutoPlay = typeof window !== 'undefined' && Boolean(
+  new URLSearchParams(window.location.search).get('job') ||
+  new URLSearchParams(window.location.search).get('play') ||
+  new URLSearchParams(window.location.search).get('view')
+);
+
 export const useGameStore = create<GameState>((set) => ({
-  hasStarted: false,
+  hasStarted: isAutoPlay,
   currentFloor: 1,
   playerPosition: { ...initialSpawn },
   interactionPrompt: null,
@@ -56,6 +70,11 @@ export const useGameStore = create<GameState>((set) => ({
   isLocked: false,
   cameraMode: 'fps',
   buildingMode: initialMode,
+
+  isUploadModalOpen: false,
+  customModelJobId: null,
+  customGlbUrl: null,
+  customMetadataUrl: null,
 
   availableRoutes: [],
   activeRoute: null,
@@ -70,6 +89,14 @@ export const useGameStore = create<GameState>((set) => ({
 
   startGame: () => set({ hasStarted: true }),
   setBuildingMode: (mode) => set({ buildingMode: mode }),
+  setUploadModalOpen: (open) => set({ isUploadModalOpen: open }),
+  setCustomModel: (jobId, glbUrl, metadataUrl) =>
+    set({
+      customModelJobId: jobId,
+      customGlbUrl: glbUrl,
+      customMetadataUrl: metadataUrl,
+      buildingMode: 'reconstructed',
+    }),
 
   setPlayerMove: (pos, floor) =>
     set((state) => {

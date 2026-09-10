@@ -1,0 +1,65 @@
+{
+  "job_id": "recon_65a90babe3",
+  "filename": "test_corridor_walkthrough.mp4",
+  "file_size_bytes": 1890757,
+  "created_at": 1788982648.2985444,
+  "updated_at": 1788982649.9670644,
+  "status": "COMPLETED",
+  "progress_pct": 100,
+  "stage_description": "3D Digital Twin successfully reconstructed and validated!",
+  "stages": {
+    "upload": {
+      "status": "COMPLETED",
+      "progress": 100
+    },
+    "extraction": {
+      "status": "COMPLETED",
+      "progress": 100
+    },
+    "feature_matching": {
+      "status": "COMPLETED",
+      "progress": 100
+    },
+    "reconstruction": {
+      "status": "COMPLETED",
+      "progress": 100
+    },
+    "mesh_generation": {
+      "status": "COMPLETED",
+      "progress": 100
+    },
+    "validation": {
+      "status": "COMPLETED",
+      "progress": 100
+    }
+  },
+  "error": null,
+  "result": {
+    "glb_url": "/api/reconstruction/model/recon_65a90babe3/building.glb",
+    "metadata_url": "/api/reconstruction/model/recon_65a90babe3/metadata.json",
+    "mesh_stats": {
+      "file_size_bytes": 8092,
+      "vertices": 235,
+      "faces": 280,
+      "extents": [
+        10.744514465332031,
+        6.3135552406311035,
+        14.51497220993042
+      ],
+      "bounds": [
+        [
+          -7.520514488220215,
+          -2.3390302658081055,
+          4.537588596343994
+        ],
+        [
+          3.2239999771118164,
+          3.974524974822998,
+          19.052560806274414
+        ]
+      ],
+      "is_valid": true
+    },
+    "extracted_frames": 8
+  }
+}

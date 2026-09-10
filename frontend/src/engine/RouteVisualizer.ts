@@ -25,13 +25,14 @@ export class RouteVisualizer {
     this.routeGroup.add(this.destinationBeacon);
     this.routeGroup.add(this.transitionMarkers);
 
-    // Dynamic glowing material
+    // Dynamic glowing material with enhanced visibility against architectural PBR floors
     this.tubeMaterial = new THREE.MeshStandardMaterial({
       color: 0x00f2fe,
-      emissive: 0x00a3cc,
-      emissiveIntensity: 0.8,
-      roughness: 0.2,
-      metalness: 0.8,
+      emissive: 0x00d8f0,
+      emissiveIntensity: 1.2,
+      roughness: 0.15,
+      metalness: 0.4,
+      toneMapped: false, // Ensures wayfinding glow remains vibrant under ACESFilmic
     });
 
     this.beaconMaterial = new THREE.MeshBasicMaterial({
@@ -60,7 +61,7 @@ export class RouteVisualizer {
 
     // Calibrate vertical offset: 0.08m for reconstructed mode to prevent z-fighting without floating
     const yOffset = isReconstructed ? 0.08 : 0.25;
-    const tubeRadius = isReconstructed ? 0.05 : 0.08;
+    const tubeRadius = isReconstructed ? 0.065 : 0.08;
 
     // 1. Build points array lifted above floor surface
     const points: THREE.Vector3[] = waypoints.map((w) => {
@@ -162,7 +163,7 @@ export class RouteVisualizer {
     this.animationTime += delta;
 
     // Pulse tube emission intensity
-    const pulse = 0.7 + Math.sin(this.animationTime * 4.0) * 0.3;
+    const pulse = 1.0 + Math.sin(this.animationTime * 4.0) * 0.35;
     this.tubeMaterial.emissiveIntensity = pulse;
 
     // Rotate destination beacon diamond and rings

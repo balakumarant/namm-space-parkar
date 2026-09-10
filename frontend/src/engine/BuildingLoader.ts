@@ -4,6 +4,7 @@ import { PhysicsWorld } from './PhysicsWorld';
 import { InteractiveZone, RoomDefinition, FloorDefinition, Vector3Tuple } from './types';
 import { BUILDING_CONFIG, BuildingMode, getInitialBuildingMode } from '../config/buildingConfig';
 import { DebugVisualizer } from './DebugVisualizer';
+import { MaterialEnhancer } from './MaterialEnhancer';
 import {
   RECONSTRUCTED_GRAPH_NODES,
   RECONSTRUCTED_GRAPH_EDGES,
@@ -35,7 +36,10 @@ export class BuildingLoader implements IBuildingLoader {
   private staticBodies: RAPIER.RigidBody[] = [];
   private reconstructedModel: THREE.Object3D | null = null;
   private reconstructedMetadata: any = null;
+  private customGlbUrl: string | null = null;
+  private customMetadataUrl: string | null = null;
   private debugVisualizer: DebugVisualizer | null = null;
+  private materialEnhancer: MaterialEnhancer = new MaterialEnhancer();
 
   constructor(initialMode?: BuildingMode) {
     if (initialMode) {
@@ -43,6 +47,15 @@ export class BuildingLoader implements IBuildingLoader {
     }
     this.initMaterials();
     this.initFloorSpecs();
+  }
+
+  public setCustomModel(glbUrl: string | null, metadataUrl: string | null = null): void {
+    this.customGlbUrl = glbUrl;
+    this.customMetadataUrl = metadataUrl;
+  }
+
+  public getCustomGlbUrl(): string | null {
+    return this.customGlbUrl;
   }
 
   public getReconstructedModel(): THREE.Object3D | null {
@@ -62,6 +75,13 @@ export class BuildingLoader implements IBuildingLoader {
   }
 
   public getSpawnPosition(): Vector3Tuple {
+    if (this.customGlbUrl && this.reconstructedModel) {
+      const box = new THREE.Box3().setFromObject(this.reconstructedModel);
+      const centerX = (box.min.x + box.max.x) / 2.0;
+      const spawnZ = box.min.z + 1.8;
+      const spawnY = Math.max(0.5, box.min.y + 0.95);
+      return { x: centerX, y: spawnY, z: spawnZ };
+    }
     if (this.buildingMode === 'reconstructed') {
       return { ...BUILDING_CONFIG.reconstructedSpawn };
     }
@@ -69,6 +89,9 @@ export class BuildingLoader implements IBuildingLoader {
   }
 
   public getSpawnYaw(): number {
+    if (this.customGlbUrl) {
+      return Math.PI; // Facing forward (+Z) down the reconstructed corridor
+    }
     if (this.buildingMode === 'reconstructed') {
       return Math.PI; // Facing forward (+Z) into the reconstructed foyer and corridors
     }
@@ -343,7 +366,9 @@ export class BuildingLoader implements IBuildingLoader {
 
     if (this.buildingMode === 'reconstructed') {
       try {
-        await this.loadReconstructedBuilding(undefined, undefined, debugVisualizer);
+        const targetGlb = this.customGlbUrl || undefined;
+        const targetMeta = this.customMetadataUrl || undefined;
+        await this.loadReconstructedBuilding(targetGlb, targetMeta, debugVisualizer);
       } catch (err) {
         console.warn('[Reconstruction Fallback] Reconstructed building failed to load, falling back to procedural building:', err);
         this.buildingMode = 'procedural';
@@ -403,113 +428,248 @@ export class BuildingLoader implements IBuildingLoader {
     const model = gltf.scene || gltf.scenes[0];
     this.reconstructedModel = model;
 
-    // Apply vertical ground alignment:
-    // In raw photogrammetry, entrance floor is at Y = -1.70m (camera at eye height Y = 0)
-    // We elevate the model by +1.70m along Y so the entrance floor sits at Y = 0.0m
-    model.position.set(
-      BUILDING_CONFIG.reconstructedOffset.x,
-      BUILDING_CONFIG.reconstructedOffset.y,
-      BUILDING_CONFIG.reconstructedOffset.z
-    );
+    // Determine if this is a custom user reconstruction
+    const isCustom = Boolean(this.customGlbUrl);
 
-    model.traverse((child: any) => {
-      if (child.isMesh) {
-        child.castShadow = true;
-        child.receiveShadow = true;
-        if (child.geometry) {
-          child.geometry.computeVertexNormals();
-        }
-        if (child.material) {
-          child.material.side = THREE.DoubleSide;
-          if (child.geometry && child.geometry.attributes.color) {
-            child.material.vertexColors = true;
+    if (isCustom) {
+      model.position.set(0, 0, 0);
+    } else {
+      // Apply vertical ground alignment for demo model:
+      // In raw photogrammetry, entrance floor is at Y = -1.70m (camera at eye height Y = 0)
+      // We elevate the model by +1.70m along Y so the entrance floor sits at Y = 0.0m
+      model.position.set(
+        BUILDING_CONFIG.reconstructedOffset.x,
+        BUILDING_CONFIG.reconstructedOffset.y,
+        BUILDING_CONFIG.reconstructedOffset.z
+      );
+    }
+
+    if (isCustom) {
+      // Custom models: preserve geometry without demo-specific coordinate/color decomposition
+      // Apply clean double-sided architectural PBR materials
+      model.traverse((child: THREE.Object3D) => {
+        if ((child as THREE.Mesh).isMesh) {
+          const mesh = child as THREE.Mesh;
+          mesh.castShadow = true;
+          mesh.receiveShadow = true;
+          if (Array.isArray(mesh.material)) {
+            mesh.material.forEach((m: THREE.Material) => {
+              m.side = THREE.DoubleSide;
+              m.shadowSide = THREE.DoubleSide;
+            });
+          } else if (mesh.material) {
+            mesh.material.side = THREE.DoubleSide;
+            mesh.material.shadowSide = THREE.DoubleSide;
           }
-          child.material.roughness = 0.65;
-          child.material.metalness = 0.1;
-          child.material.needsUpdate = true;
         }
-      }
-    });
+      });
+    } else {
+      // Apply realistic PBR architectural material system for demo model (Phase 5D)
+      this.materialEnhancer.enhance(model);
+    }
 
     this.buildingGroup.add(model);
 
-    // 3. Register separated Rapier physics colliders
-    // Top surface of walkable floor at Y = 0.0m
-    // Calibrated bounds: X [-3.84, 2.20] (width 6.04m), Z [1.30, 13.40] (length 12.10m)
-    const floorCenterX = -0.82;
-    const floorCenterZ = 7.35;
-    const floorHalfW = 3.02;
-    const floorHalfL = 6.05;
+    if (isCustom) {
+      // Dynamic illumination covering the custom model's bounding box
+      const modelBox = new THREE.Box3().setFromObject(model);
+      const cx = (modelBox.min.x + modelBox.max.x) / 2.0;
+      const cy = Math.max(2.5, (modelBox.min.y + modelBox.max.y) / 2.0 + 1.0);
+      const cz = (modelBox.min.z + modelBox.max.z) / 2.0;
+      const radius = Math.max(10.0, Math.max(modelBox.max.x - modelBox.min.x, modelBox.max.z - modelBox.min.z));
 
-    // Walkable floor slab (thickness 0.3m, top at Y = 0.0m)
-    this.addStaticBox(floorCenterX, -0.15, floorCenterZ, floorHalfW, 0.15, floorHalfL, 0.6);
+      const customAmbient = new THREE.AmbientLight(0xffffff, 0.9);
+      customAmbient.name = 'custom_ambient';
+      this.buildingGroup.add(customAmbient);
 
-    // Outer boundary walls (prevent falling off or escaping the reconstructed building)
-    const wallH = 1.45;
-    this.addStaticBox(-3.90, wallH, floorCenterZ, 0.2, wallH, floorHalfL); // West wall
-    this.addStaticBox(2.25, wallH, floorCenterZ, 0.2, wallH, floorHalfL);  // East wall
-    this.addStaticBox(floorCenterX, wallH, 1.25, floorHalfW, wallH, 0.2); // South entrance back wall
-    this.addStaticBox(floorCenterX, wallH, 13.45, floorHalfW, wallH, 0.2); // North far end wall
+      const customKeyLight = new THREE.PointLight(0xfff5ea, 1.2, radius * 2.0, 1.0);
+      customKeyLight.name = 'custom_key_light';
+      customKeyLight.position.set(cx, cy, cz);
+      this.buildingGroup.add(customKeyLight);
 
-    // Hallway corridor partitions at the entrance foyer
-    this.addStaticBox(-1.60, wallH, 4.25, 0.15, wallH, 2.0); // West entrance partition
-    this.addStaticBox(1.90, wallH, 4.25, 0.15, wallH, 2.0);  // East entrance partition
+      const customFill1 = new THREE.PointLight(0xdbeafe, 0.8, radius * 1.5, 1.0);
+      customFill1.position.set(cx, cy, modelBox.min.z + 2.0);
+      this.buildingGroup.add(customFill1);
 
-    // Structural columns (at Z = 6.80m, X = -0.45m and +0.45m)
-    this.addStaticBox(-0.45, wallH, 6.80, 0.20, wallH, 0.20);
-    this.addStaticBox(0.45, wallH, 6.80, 0.20, wallH, 0.20);
+      const customFill2 = new THREE.PointLight(0xfef3c7, 0.8, radius * 1.5, 1.0);
+      customFill2.position.set(cx, cy, modelBox.max.z - 2.0);
+      this.buildingGroup.add(customFill2);
+    } else {
+      // Warm architectural recessed lights along corridor ceiling (Y = 2.5m) for demo model
+      const interiorLights = [
+        { name: 'light_foyer', color: 0xffedd5, intensity: 0.7, dist: 7.0, x: 0.0, y: 2.5, z: 3.2 },
+        { name: 'light_stairs', color: 0xffe4cc, intensity: 0.6, dist: 7.0, x: 1.5, y: 2.4, z: 4.8 },
+        { name: 'light_columns', color: 0xfff3e6, intensity: 0.8, dist: 8.5, x: 0.0, y: 2.5, z: 6.8 },
+        { name: 'light_dining', color: 0xffedd5, intensity: 0.7, dist: 7.5, x: 1.4, y: 2.5, z: 9.5 },
+        { name: 'light_lounge', color: 0xffddb0, intensity: 0.7, dist: 8.0, x: -2.0, y: 2.5, z: 10.8 },
+        { name: 'light_north_daylight', color: 0xd8eeff, intensity: 0.8, dist: 7.5, x: 0.0, y: 2.2, z: 12.8 },
+      ];
 
-    // Foyer staircase incline & landing (staircase at X: 1.0 to 2.0, Z: 2.4 to 6.2)
-    this.addStaticIncline(1.50, 0.7, 4.30, 0.50, 0.15, 1.9, 0.40); // Incline ramp
+      interiorLights.forEach((l) => {
+        const pl = new THREE.PointLight(l.color, l.intensity, l.dist, 2.0);
+        pl.name = l.name;
+        pl.position.set(l.x, l.y, l.z);
+        pl.castShadow = false;
+        this.buildingGroup.add(pl);
+      });
+    }
 
-    // 4. Floating 3D Signage Badges for Reconstructed Areas
-    const signFoyer = this.createFloatingTextBadge('MAIN SOUTH ENTRANCE', 3.0, 0.8, 0x00f2fe);
-    signFoyer.position.set(0.0, 2.2, 2.8);
-    this.buildingGroup.add(signFoyer);
+    if (isCustom) {
+      // Calculate dynamic bounds from the loaded custom model
+      const modelBox = new THREE.Box3().setFromObject(model);
+      const floorCenterX = (modelBox.min.x + modelBox.max.x) / 2.0;
+      const floorCenterZ = (modelBox.min.z + modelBox.max.z) / 2.0;
+      const floorHalfW = Math.max(1.0, (modelBox.max.x - modelBox.min.x) / 2.0 + 1.0);
+      const floorHalfL = Math.max(1.0, (modelBox.max.z - modelBox.min.z) / 2.0 + 1.0);
+      const floorY = 0.0;
 
-    const signStairs = this.createFloatingTextBadge('FOYER STAIRCASE', 2.8, 0.7, 0xf59e0b);
-    signStairs.position.set(1.5, 2.2, 4.3);
-    this.buildingGroup.add(signStairs);
+      // Dynamic walkable floor matching custom model's extents
+      this.addStaticBox(floorCenterX, floorY - 0.15, floorCenterZ, floorHalfW, 0.15, floorHalfL, 0.6);
 
-    const signColumns = this.createFloatingTextBadge('COLUMNS CONCOURSE', 3.2, 0.8, 0x10b981);
-    signColumns.position.set(0.0, 2.2, 6.8);
-    this.buildingGroup.add(signColumns);
+      // Custom corridor perimeter walls (placed at corridor boundaries)
+      const wallH = Math.max(2.0, (modelBox.max.y - modelBox.min.y));
+      // Left boundary wall
+      this.addStaticBox(modelBox.min.x - 0.1, floorY + wallH / 2, floorCenterZ, 0.15, wallH / 2, floorHalfL);
+      // Right boundary wall
+      this.addStaticBox(modelBox.max.x + 0.1, floorY + wallH / 2, floorCenterZ, 0.15, wallH / 2, floorHalfL);
+      // South entrance back wall
+      this.addStaticBox(floorCenterX, floorY + wallH / 2, modelBox.min.z - 0.3, floorHalfW, wallH / 2, 0.15);
+      // North far end wall
+      this.addStaticBox(floorCenterX, floorY + wallH / 2, modelBox.max.z + 0.3, floorHalfW, wallH / 2, 0.15);
 
-    const signDining = this.createFloatingTextBadge('EAST DINING AREA', 2.8, 0.7, 0x3b82f6);
-    signDining.position.set(1.4, 2.2, 9.5);
-    this.buildingGroup.add(signDining);
+      // Custom User Digital Twin Badges matching the reconstructed corridor
+      const customBadge = this.createFloatingTextBadge('BUILDING E18 CORRIDOR', 2.4, 0.50, 0x00f2fe, true);
+      customBadge.position.set(floorCenterX, floorY + 2.5, modelBox.min.z + 2.2);
+      customBadge.rotation.y = Math.PI;
+      this.buildingGroup.add(customBadge);
 
-    const signLounge = this.createFloatingTextBadge('LIVING & FIREPLACE LOUNGE', 3.6, 0.8, 0xec4899);
-    signLounge.position.set(-2.2, 2.2, 10.8);
-    this.buildingGroup.add(signLounge);
+      const signDoor1 = this.createFloatingTextBadge('OFFICE DOOR E18-A', 1.8, 0.45, 0x10b981, false);
+      signDoor1.position.set(modelBox.max.x - 0.2, floorY + 2.40, 5.2);
+      signDoor1.rotation.y = -Math.PI / 2;
+      this.buildingGroup.add(signDoor1);
 
-    // 5. Register interactive zones
-    this.registerReconstructedInteractiveZones();
+      const signDoor2 = this.createFloatingTextBadge('TECH SUPPORT HUB', 1.8, 0.45, 0x3b82f6, false);
+      signDoor2.position.set(modelBox.max.x - 0.2, floorY + 2.40, 13.5);
+      signDoor2.rotation.y = -Math.PI / 2;
+      this.buildingGroup.add(signDoor2);
+
+      // Register dynamic interactive zones from metadata POIs
+      if (this.reconstructedMetadata?.pois && Array.isArray(this.reconstructedMetadata.pois)) {
+        this.interactiveZones = this.reconstructedMetadata.pois.map((poi: any) => ({
+          id: poi.id,
+          name: poi.name,
+          type: poi.category === 'entrance' ? 'info' : 'room',
+          position: { x: poi.position.x, y: poi.position.y ?? floorY, z: poi.position.z },
+          radius: 3.0,
+          prompt: `Press [E] to Inspect ${poi.name}`,
+        }));
+      } else {
+        this.interactiveZones = [
+          {
+            id: 'custom_zone_entrance',
+            name: 'Building E18 Entrance Portal',
+            type: 'info',
+            position: { x: floorCenterX, y: floorY, z: modelBox.min.z + 1.8 },
+            radius: 3.0,
+            prompt: 'Press [E] to Inspect Reconstructed Corridor',
+          }
+        ];
+      }
+    } else {
+      // 3. Register demo Rapier physics colliders for default demo building
+      // Top surface of walkable floor at Y = 0.0m
+      // Calibrated bounds: X [-3.84, 2.20] (width 6.04m), Z [1.30, 13.40] (length 12.10m)
+      const floorCenterX = -0.82;
+      const floorCenterZ = 7.35;
+      const floorHalfW = 3.02;
+      const floorHalfL = 6.05;
+
+      // Walkable floor slab (thickness 0.3m, top at Y = 0.0m)
+      this.addStaticBox(floorCenterX, -0.15, floorCenterZ, floorHalfW, 0.15, floorHalfL, 0.6);
+
+      // Outer boundary walls (prevent falling off or escaping the reconstructed building)
+      const wallH = 1.45;
+      this.addStaticBox(-3.90, wallH, floorCenterZ, 0.2, wallH, floorHalfL); // West wall
+      this.addStaticBox(2.25, wallH, floorCenterZ, 0.2, wallH, floorHalfL);  // East wall
+      this.addStaticBox(floorCenterX, wallH, 1.25, floorHalfW, wallH, 0.2); // South entrance back wall
+      this.addStaticBox(floorCenterX, wallH, 13.45, floorHalfW, wallH, 0.2); // North far end wall
+
+      // Hallway corridor partitions at the entrance foyer
+      this.addStaticBox(-1.60, wallH, 4.25, 0.15, wallH, 2.0); // West entrance partition
+      this.addStaticBox(1.90, wallH, 4.25, 0.15, wallH, 2.0);  // East entrance partition
+
+      // Structural columns (at Z = 6.80m, X = -0.45m and +0.45m)
+      this.addStaticBox(-0.45, wallH, 6.80, 0.20, wallH, 0.20);
+      this.addStaticBox(0.45, wallH, 6.80, 0.20, wallH, 0.20);
+
+      // Foyer staircase incline & landing (staircase at X: 1.0 to 2.0, Z: 2.4 to 6.2)
+      this.addStaticIncline(1.50, 0.7, 4.30, 0.50, 0.15, 1.9, 0.40); // Incline ramp
+
+      // 4. Architectural Signage Plaques (physically wall-mounted or ceiling-suspended)
+      const signFoyer = this.createFloatingTextBadge('MAIN SOUTH ENTRANCE', 2.0, 0.50, 0x00f2fe, true);
+      signFoyer.position.set(0.0, 2.45, 2.8);
+      signFoyer.rotation.y = Math.PI;
+      this.buildingGroup.add(signFoyer);
+
+      const signStairs = this.createFloatingTextBadge('FOYER STAIRCASE', 1.8, 0.45, 0xf59e0b, false);
+      signStairs.position.set(1.88, 2.30, 4.3);
+      signStairs.rotation.y = -Math.PI / 2;
+      this.buildingGroup.add(signStairs);
+
+      const signColumns = this.createFloatingTextBadge('COLUMNS CONCOURSE', 2.0, 0.50, 0x10b981, true);
+      signColumns.position.set(0.0, 2.45, 6.8);
+      signColumns.rotation.y = Math.PI;
+      this.buildingGroup.add(signColumns);
+
+      const signDining = this.createFloatingTextBadge('EAST DINING AREA', 1.8, 0.45, 0x3b82f6, false);
+      signDining.position.set(1.88, 2.30, 9.5);
+      signDining.rotation.y = -Math.PI / 2;
+      this.buildingGroup.add(signDining);
+
+      const signLounge = this.createFloatingTextBadge('LIVING & FIREPLACE LOUNGE', 2.2, 0.50, 0xec4899, false);
+      signLounge.position.set(-3.38, 2.30, 10.8);
+      signLounge.rotation.y = Math.PI / 2;
+      this.buildingGroup.add(signLounge);
+
+      // 5. Register interactive zones
+      this.registerReconstructedInteractiveZones();
+    }
 
     // 6. Debug visualizer setup if active
     const dbg = debugVisualizer || this.debugVisualizer;
     if (dbg) {
       dbg.clear();
-      // Model bounding box (offset by Y + 1.70)
-      dbg.addBoundingBox(
-        new THREE.Vector3(-13.03, -4.86, 2.14),
-        new THREE.Vector3(10.37, 7.07, 54.37),
-        0x00f2fe
-      );
-      dbg.addSpawnMarker(BUILDING_CONFIG.reconstructedSpawn, 0x00ff88);
-      // Floor wireframe
-      dbg.addCollisionBox(floorCenterX, -0.15, floorCenterZ, floorHalfW, 0.15, floorHalfL, 0x00aaff);
-      // Outer walls
-      dbg.addCollisionBox(-13.1, wallH, floorCenterZ, 0.2, wallH, floorHalfL, 0xffaa00);
-      dbg.addCollisionBox(10.4, wallH, floorCenterZ, 0.2, wallH, floorHalfL, 0xffaa00);
-      dbg.addCollisionBox(floorCenterX, wallH, 2.14, floorHalfW, wallH, 0.2, 0xffaa00);
-      dbg.addCollisionBox(floorCenterX, wallH, 54.37, floorHalfW, wallH, 0.2, 0xffaa00);
-      // Partitions
-      dbg.addCollisionBox(-1.3, 2.0, 4.75, 0.15, 2.0, 2.25, 0xff5500);
-      dbg.addCollisionBox(1.9, 2.0, 4.25, 0.15, 2.0, 1.75, 0xff5500);
-      // Obstacles
-      dbg.addCollisionBox(-1.5, 2.0, 22.0, 0.6, 2.0, 0.6, 0xff00ff);
-      dbg.addCollisionBox(0.0, 0.45, 34.0, 1.2, 0.45, 1.8, 0xff00ff);
+      if (isCustom) {
+        const modelBox = new THREE.Box3().setFromObject(model);
+        dbg.addBoundingBox(modelBox.min, modelBox.max, 0x00f2fe);
+        dbg.addSpawnMarker(this.getSpawnPosition(), 0x00ff88);
+      } else {
+        const floorCenterX = -0.82;
+        const floorCenterZ = 7.35;
+        const floorHalfW = 3.02;
+        const floorHalfL = 6.05;
+        const wallH = 1.45;
+        // Model bounding box (offset by Y + 1.70)
+        dbg.addBoundingBox(
+          new THREE.Vector3(-13.03, -4.86, 2.14),
+          new THREE.Vector3(10.37, 7.07, 54.37),
+          0x00f2fe
+        );
+        dbg.addSpawnMarker(BUILDING_CONFIG.reconstructedSpawn, 0x00ff88);
+        // Floor wireframe
+        dbg.addCollisionBox(floorCenterX, -0.15, floorCenterZ, floorHalfW, 0.15, floorHalfL, 0x00aaff);
+        // Outer walls
+        dbg.addCollisionBox(-13.1, wallH, floorCenterZ, 0.2, wallH, floorHalfL, 0xffaa00);
+        dbg.addCollisionBox(10.4, wallH, floorCenterZ, 0.2, wallH, floorHalfL, 0xffaa00);
+        dbg.addCollisionBox(floorCenterX, wallH, 2.14, floorHalfW, wallH, 0.2, 0xffaa00);
+        dbg.addCollisionBox(floorCenterX, wallH, 54.37, floorHalfW, wallH, 0.2, 0xffaa00);
+        // Partitions
+        dbg.addCollisionBox(-1.3, 2.0, 4.75, 0.15, 2.0, 2.25, 0xff5500);
+        dbg.addCollisionBox(1.9, 2.0, 4.25, 0.15, 2.0, 1.75, 0xff5500);
+        // Obstacles
+        dbg.addCollisionBox(-1.5, 2.0, 22.0, 0.6, 2.0, 0.6, 0xff00ff);
+        dbg.addCollisionBox(0.0, 0.45, 34.0, 1.2, 0.45, 1.8, 0xff00ff);
+      }
       // Axes and grid
       dbg.addAxes(5.0);
       dbg.addFloorGrid(60, 60, 0.0);
@@ -975,46 +1135,63 @@ export class BuildingLoader implements IBuildingLoader {
   }
 
   /**
-   * Helper to create crisp high-resolution text badge sprites for room signage
+   * Helper to create crisp high-resolution architectural signage plaques with optional ceiling hangers
    */
   private createFloatingTextBadge(
     text: string,
     width: number,
     height: number,
-    glowColor: number = 0x00f2fe
+    glowColor: number = 0x00f2fe,
+    addHangers: boolean = false
   ): THREE.Mesh {
     const canvas = document.createElement('canvas');
-    canvas.width = 512;
-    canvas.height = 128;
+    canvas.width = 1024;
+    canvas.height = 256;
     const ctx = canvas.getContext('2d')!;
 
-    // Dark sleek background pill
-    ctx.fillStyle = 'rgba(10, 15, 24, 0.88)';
-    ctx.roundRect(10, 10, 492, 108, 20);
+    // Dark architectural smoked glass plaque
+    ctx.fillStyle = 'rgba(12, 16, 24, 0.90)';
+    ctx.roundRect(16, 16, 992, 224, 28);
     ctx.fill();
 
-    // Glowing border
-    ctx.lineWidth = 6;
+    // Architectural subtle border
+    ctx.lineWidth = 8;
     ctx.strokeStyle = `#${glowColor.toString(16).padStart(6, '0')}`;
     ctx.stroke();
 
-    // High contrast typography
-    ctx.font = 'bold 36px Outfit, sans-serif';
+    // Modern high-contrast typography
+    ctx.font = '600 48px Outfit, sans-serif';
     ctx.fillStyle = '#ffffff';
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
-    ctx.fillText(text, 256, 64);
+    ctx.fillText(text, 512, 128);
 
     const texture = new THREE.CanvasTexture(canvas);
     texture.minFilter = THREE.LinearFilter;
 
-    const planeMat = new THREE.MeshBasicMaterial({
+    const planeMat = new THREE.MeshStandardMaterial({
       map: texture,
       transparent: true,
+      roughness: 0.25,
+      metalness: 0.15,
       side: THREE.DoubleSide,
     });
 
-    return new THREE.Mesh(new THREE.PlaneGeometry(width, height), planeMat);
+    const plaqueMesh = new THREE.Mesh(new THREE.PlaneGeometry(width, height), planeMat);
+
+    // Slim architectural stainless steel hanger rods to ceiling (Y = 2.70m)
+    if (addHangers) {
+      const hangerH = 0.35;
+      const rodGeo = new THREE.CylinderGeometry(0.008, 0.008, hangerH, 8);
+      const rodMat = new THREE.MeshStandardMaterial({ color: 0xd0d4dc, roughness: 0.30, metalness: 0.85 });
+      [-width / 2 + 0.15, width / 2 - 0.15].forEach((hx) => {
+        const rod = new THREE.Mesh(rodGeo, rodMat);
+        rod.position.set(hx, height / 2 + hangerH / 2, 0);
+        plaqueMesh.add(rod);
+      });
+    }
+
+    return plaqueMesh;
   }
 
   getInteractiveZones(): InteractiveZone[] {
@@ -1041,6 +1218,7 @@ export class BuildingLoader implements IBuildingLoader {
     if (this.scene && this.buildingGroup) {
       this.scene.remove(this.buildingGroup);
     }
+    this.materialEnhancer.dispose();
     Object.values(this.materials).forEach((m) => m.dispose());
   }
 }

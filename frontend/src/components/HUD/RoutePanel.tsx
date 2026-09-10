@@ -17,6 +17,11 @@ const PROCEDURAL_DESTINATIONS = [
 ];
 
 const RECONSTRUCTED_DESTINATIONS = [
+  { id: 'poi_recon_entry', name: 'Corridor Entrance Portal (Bldg E18)', floor: 1 },
+  { id: 'poi_recon_door1', name: 'Office Door E18-A (Right Wall)', floor: 1 },
+  { id: 'poi_recon_door2', name: 'Tech Support Hub (Right Wall)', floor: 1 },
+  { id: 'poi_recon_door3', name: 'Logistics Service Door (Right Wall)', floor: 1 },
+  { id: 'poi_recon_vista', name: 'Far End Corridor Vista', floor: 1 },
   { id: 'room_101', name: 'Room 101 - Techfest Robotics Wing', floor: 1 },
   { id: 'f1_entrance', name: 'Main South Entrance', floor: 1 },
   { id: 'f1_stairs', name: 'Grand Foyer Staircase', floor: 1 },

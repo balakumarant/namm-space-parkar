@@ -1,0 +1,38 @@
+{
+  "job_id": "recon_ce016e9e40",
+  "filename": "test_corridor_walkthrough.mp4",
+  "file_size_bytes": 1890757,
+  "created_at": 1788984559.0361018,
+  "updated_at": 1788984560.2509727,
+  "status": "FAILED",
+  "progress_pct": 75,
+  "stage_description": "Pipeline failed: Mesh Quality Validation Failed: has_nan=False, bounds_ok=True, max_edge=28.26m",
+  "stages": {
+    "upload": {
+      "status": "COMPLETED",
+      "progress": 100
+    },
+    "extraction": {
+      "status": "IN_PROGRESS",
+      "progress": 20
+    },
+    "feature_matching": {
+      "status": "IN_PROGRESS",
+      "progress": 40
+    },
+    "reconstruction": {
+      "status": "IN_PROGRESS",
+      "progress": 60
+    },
+    "mesh_generation": {
+      "status": "IN_PROGRESS",
+      "progress": 80
+    },
+    "validation": {
+      "status": "PENDING",
+      "progress": 0
+    }
+  },
+  "error": "Mesh Quality Validation Failed: has_nan=False, bounds_ok=True, max_edge=28.26m",
+  "result": null
+}

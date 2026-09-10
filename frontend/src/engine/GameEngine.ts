@@ -116,8 +116,22 @@ export class GameEngine {
   }
 
   public async switchBuildingMode(mode: BuildingMode): Promise<void> {
-    if (this.buildingLoader.getMode() === mode) return;
+    if (this.buildingLoader.getMode() === mode && !this.buildingLoader.getCustomGlbUrl()) return;
+    this.buildingLoader.setCustomModel(null, null);
     this.buildingLoader.setMode(mode);
+    await this.buildingLoader.build(this.sceneManager.scene, this.physicsWorld, this.debugVisualizer);
+
+    if (this.playerController) {
+      this.playerController.setInteractiveZones(this.buildingLoader.getInteractiveZones());
+      const newSpawn = this.buildingLoader.getSpawnPosition();
+      const newYaw = this.buildingLoader.getSpawnYaw();
+      this.playerController.respawn(newSpawn, newYaw);
+    }
+  }
+
+  public async loadCustomModel(glbUrl: string, metadataUrl?: string): Promise<void> {
+    this.buildingLoader.setCustomModel(glbUrl, metadataUrl || null);
+    this.buildingLoader.setMode('reconstructed');
     await this.buildingLoader.build(this.sceneManager.scene, this.physicsWorld, this.debugVisualizer);
 
     if (this.playerController) {

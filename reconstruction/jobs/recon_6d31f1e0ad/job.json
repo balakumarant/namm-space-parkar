@@ -1,0 +1,66 @@
+{
+  "job_id": "recon_6d31f1e0ad",
+  "filename": "Screen Recording 2026-09-10 004816.mp4",
+  "file_size_bytes": 17159341,
+  "created_at": 1788986969.3372931,
+  "updated_at": 1788987027.6522815,
+  "status": "COMPLETED",
+  "progress_pct": 100,
+  "stage_description": "3D Digital Twin successfully reconstructed and validated!",
+  "stages": {
+    "upload": {
+      "status": "COMPLETED",
+      "progress": 100
+    },
+    "extraction": {
+      "status": "COMPLETED",
+      "progress": 100
+    },
+    "feature_matching": {
+      "status": "COMPLETED",
+      "progress": 100
+    },
+    "reconstruction": {
+      "status": "COMPLETED",
+      "progress": 100
+    },
+    "mesh_generation": {
+      "status": "COMPLETED",
+      "progress": 100
+    },
+    "validation": {
+      "status": "COMPLETED",
+      "progress": 100
+    }
+  },
+  "error": null,
+  "result": {
+    "glb_url": "/api/reconstruction/model/recon_6d31f1e0ad/building.glb",
+    "metadata_url": "/api/reconstruction/model/recon_6d31f1e0ad/metadata.json",
+    "diagnostics_url": "/api/reconstruction/diagnostics/recon_6d31f1e0ad",
+    "mesh_stats": {
+      "file_size_bytes": 12892,
+      "vertices": 352,
+      "faces": 528,
+      "extents": [
+        4.555633068084717,
+        4.830773711204529,
+        31.567323684692383
+      ],
+      "bounds": [
+        [
+          -1.75,
+          -1.038136601448059,
+          -1.25
+        ],
+        [
+          2.805633068084717,
+          3.7926371097564697,
+          30.317323684692383
+        ]
+      ],
+      "is_valid": true
+    },
+    "extracted_frames": 38
+  }
+}

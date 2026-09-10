@@ -11,6 +11,21 @@ export const Minimap: React.FC = () => {
   const activeRoute = useGameStore((state) => state.activeRoute);
   const targetPOIName = useGameStore((state) => state.targetPOIName);
   const buildingMode = useGameStore((state) => state.buildingMode);
+  const customMetadataUrl = useGameStore((state) => state.customMetadataUrl);
+  const customModelJobId = useGameStore((state) => state.customModelJobId);
+
+  const [customMeta, setCustomMeta] = useState<any>(null);
+
+  useEffect(() => {
+    if (customMetadataUrl && customModelJobId) {
+      fetch(customMetadataUrl)
+        .then((res) => (res.ok ? res.json() : null))
+        .then((data) => setCustomMeta(data))
+        .catch((err) => console.warn('Minimap metadata fetch error:', err));
+    } else {
+      setCustomMeta(null);
+    }
+  }, [customMetadataUrl, customModelJobId]);
 
   const width = isExpanded ? 260 : 170;
   const height = isExpanded ? 320 : 210;
@@ -29,21 +44,84 @@ export const Minimap: React.FC = () => {
     const drawW = width - padding * 2;
     const drawH = height - padding * 2;
     const isReconstructed = buildingMode === 'reconstructed';
+    const isCustom = Boolean(customModelJobId && customMeta);
 
-    // World to canvas coordinate transform
-    // Procedural: X in [-12, 12], Z in [-25, 25]
-    // Reconstructed: X in [-14, 12] (span 26m), Z in [0, 56] (span 56m)
-    const toCanvasX = (x: number) =>
-      isReconstructed
-        ? padding + ((x + 14) / 26) * drawW
-        : padding + ((x + 12) / 24) * drawW;
+    // Coordinate transforms
+    let toCanvasX: (x: number) => number;
+    let toCanvasY: (z: number) => number;
 
-    const toCanvasY = (z: number) =>
-      isReconstructed
-        ? padding + (z / 56) * drawH
-        : padding + ((z + 25) / 50) * drawH;
+    if (isCustom && customMeta?.bounds) {
+      const bMinX = customMeta.bounds.min[0] - 1.0;
+      const bMaxX = customMeta.bounds.max[0] + 1.0;
+      const bMinZ = customMeta.bounds.min[2] - 1.0;
+      const bMaxZ = customMeta.bounds.max[2] + 1.0;
+      const spanX = Math.max(1.0, bMaxX - bMinX);
+      const spanZ = Math.max(1.0, bMaxZ - bMinZ);
 
-    if (isReconstructed) {
+      toCanvasX = (x: number) => padding + ((x - bMinX) / spanX) * drawW;
+      toCanvasY = (z: number) => padding + ((z - bMinZ) / spanZ) * drawH;
+    } else if (isReconstructed) {
+      toCanvasX = (x: number) => padding + ((x + 14) / 26) * drawW;
+      toCanvasY = (z: number) => padding + (z / 56) * drawH;
+    } else {
+      toCanvasX = (x: number) => padding + ((x + 12) / 24) * drawW;
+      toCanvasY = (z: number) => padding + ((z + 25) / 50) * drawH;
+    }
+
+    if (isCustom && customMeta?.bounds) {
+      // ----------------------------------------------------
+      // DYNAMIC CUSTOM USER RECONSTRUCTED TWIN MINIMAP
+      // ----------------------------------------------------
+      const minX = customMeta.bounds.min[0];
+      const maxX = customMeta.bounds.max[0];
+      const minZ = customMeta.bounds.min[2];
+      const maxZ = customMeta.bounds.max[2];
+
+      // Perimeter
+      ctx.strokeStyle = '#00f2fe';
+      ctx.lineWidth = 1.5;
+      const rLeft = toCanvasX(minX);
+      const rRight = toCanvasX(maxX);
+      const rTop = toCanvasY(minZ);
+      const rBottom = toCanvasY(maxZ);
+      ctx.strokeRect(rLeft, rTop, rRight - rLeft, rBottom - rTop);
+
+      // Walkable Floor Fill
+      ctx.fillStyle = 'rgba(0, 242, 254, 0.08)';
+      ctx.fillRect(rLeft, rTop, rRight - rLeft, rBottom - rTop);
+
+      // Rooms / Zones from metadata
+      if (Array.isArray(customMeta.rooms)) {
+        customMeta.rooms.forEach((rm: any, idx: number) => {
+          const rx = toCanvasX(rm.center[0]);
+          const rz = toCanvasY(rm.center[2]);
+          ctx.fillStyle = idx === 0 ? 'rgba(16, 185, 129, 0.25)' : 'rgba(59, 130, 246, 0.25)';
+          ctx.beginPath();
+          ctx.arc(rx, rz, 8, 0, Math.PI * 2);
+          ctx.fill();
+
+          ctx.font = 'bold 7px monospace';
+          ctx.fillStyle = idx === 0 ? '#10b981' : '#38bdf8';
+          ctx.fillText(rm.name || 'Zone', rx + 6, rz + 3);
+        });
+      }
+
+      // POIs from metadata
+      if (Array.isArray(customMeta.pois)) {
+        customMeta.pois.forEach((poi: any) => {
+          const px = toCanvasX(poi.position.x);
+          const py = toCanvasY(poi.position.z);
+          ctx.fillStyle = poi.category === 'entrance' ? '#00f2fe' : '#f59e0b';
+          ctx.beginPath();
+          ctx.arc(px, py, 3, 0, Math.PI * 2);
+          ctx.fill();
+
+          ctx.font = 'bold 7px monospace';
+          ctx.fillStyle = '#e2e8f0';
+          ctx.fillText(poi.name || 'POI', px + 5, py + 2.5);
+        });
+      }
+    } else if (isReconstructed) {
       // ----------------------------------------------------
       // RECONSTRUCTED DIGITAL TWIN MINIMAP
       // ----------------------------------------------------
@@ -250,7 +328,7 @@ export const Minimap: React.FC = () => {
     ctx.beginPath();
     ctx.arc(px, py, 1.8, 0, Math.PI * 2);
     ctx.fill();
-  }, [playerPos, currentFloor, activeRoute, isExpanded, width, height, buildingMode]);
+  }, [playerPos, currentFloor, activeRoute, isExpanded, width, height, buildingMode, customModelJobId, customMeta]);
 
   return (
     <div className="pointer-events-auto flex flex-col items-end gap-1">

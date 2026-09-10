@@ -1,0 +1,66 @@
+{
+  "job_id": "recon_3879bb3f94",
+  "filename": "indoor_building.mp4",
+  "file_size_bytes": 554751,
+  "created_at": 1788984701.4184325,
+  "updated_at": 1788984706.5536535,
+  "status": "COMPLETED",
+  "progress_pct": 100,
+  "stage_description": "3D Digital Twin successfully reconstructed and validated!",
+  "stages": {
+    "upload": {
+      "status": "COMPLETED",
+      "progress": 100
+    },
+    "extraction": {
+      "status": "COMPLETED",
+      "progress": 100
+    },
+    "feature_matching": {
+      "status": "COMPLETED",
+      "progress": 100
+    },
+    "reconstruction": {
+      "status": "COMPLETED",
+      "progress": 100
+    },
+    "mesh_generation": {
+      "status": "COMPLETED",
+      "progress": 100
+    },
+    "validation": {
+      "status": "COMPLETED",
+      "progress": 100
+    }
+  },
+  "error": null,
+  "result": {
+    "glb_url": "/api/reconstruction/model/recon_3879bb3f94/building.glb",
+    "metadata_url": "/api/reconstruction/model/recon_3879bb3f94/metadata.json",
+    "diagnostics_url": "/api/reconstruction/diagnostics/recon_3879bb3f94",
+    "mesh_stats": {
+      "file_size_bytes": 2840,
+      "vertices": 56,
+      "faces": 84,
+      "extents": [
+        26.54796016216278,
+        3.44999997317791,
+        27.301246643066406
+      ],
+      "bounds": [
+        [
+          -24.65865135192871,
+          -0.24872462451457977,
+          -1.25
+        ],
+        [
+          1.8893088102340698,
+          3.20127534866333,
+          26.051246643066406
+        ]
+      ],
+      "is_valid": true
+    },
+    "extracted_frames": 10
+  }
+}

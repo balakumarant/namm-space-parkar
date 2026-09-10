@@ -577,7 +577,6 @@ def reconstruct_from_frames(
         non_deg = cleaned_mesh.nondegenerate_faces()
         if len(non_deg) > 0:
             cleaned_mesh.update_faces(non_deg)
-        cleaned_mesh.remove_duplicate_faces()
         cleaned_mesh.remove_unreferenced_vertices()
         cleaned_mesh.fix_normals()
     except Exception as e:

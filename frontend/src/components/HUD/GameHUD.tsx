@@ -1,10 +1,11 @@
 import React, { useEffect } from 'react';
 import { useGameStore } from '../../stores/useGameStore';
-import { Layers, Compass, Footprints, Eye } from 'lucide-react';
+import { Layers, Compass, Footprints, Eye, UploadCloud } from 'lucide-react';
 import { RoutePanel } from './RoutePanel';
 import { TurnByTurnCard } from './TurnByTurnCard';
 import { Minimap } from './Minimap';
 import { ParkarChatDrawer } from '../ParkarChat/ParkarChatDrawer';
+import { VideoUploadModal } from '../Upload/VideoUploadModal';
 
 interface GameHUDProps {
   onPlay?: () => void;
@@ -21,6 +22,8 @@ export const GameHUD: React.FC<GameHUDProps> = ({ onPlay }) => {
   const cameraMode = useGameStore((state) => state.cameraMode);
   const buildingMode = useGameStore((state) => state.buildingMode);
   const setBuildingMode = useGameStore((state) => state.setBuildingMode);
+  const setUploadModalOpen = useGameStore((state) => state.setUploadModalOpen);
+  const customModelJobId = useGameStore((state) => state.customModelJobId);
 
   // Auto-dismiss notification after 3.5 seconds
   const setNotification = useGameStore((state) => state.setNotification);
@@ -32,6 +35,16 @@ export const GameHUD: React.FC<GameHUDProps> = ({ onPlay }) => {
       return () => clearTimeout(timer);
     }
   }, [notification, setNotification]);
+
+  // Support automated testing / autostart via URL query param
+  useEffect(() => {
+    if (typeof window !== 'undefined' && window.location) {
+      const params = new URLSearchParams(window.location.search);
+      if (params.get('autostart') === '1' || params.get('autostart') === 'true') {
+        startGame();
+      }
+    }
+  }, [startGame]);
 
   return (
     <div className="absolute inset-0 pointer-events-none z-10 flex flex-col justify-between p-6">
@@ -63,7 +76,20 @@ export const GameHUD: React.FC<GameHUDProps> = ({ onPlay }) => {
                   className="pointer-events-auto text-[10px] tracking-wider uppercase font-bold px-2.5 py-1 rounded bg-cyan-950/90 hover:bg-cyan-900 border border-cyan-500/40 text-cyan-300 transition-all cursor-pointer flex items-center gap-1.5 shadow-sm"
                 >
                   <span className={`w-2 h-2 rounded-full ${buildingMode === 'reconstructed' ? 'bg-emerald-400 animate-pulse' : 'bg-amber-400'}`}></span>
-                  {buildingMode === 'reconstructed' ? '● REAL DIGITAL TWIN' : '● PROCEDURAL TEST'}
+                  {customModelJobId ? '● CUSTOM USER TWIN' : buildingMode === 'reconstructed' ? '● REAL DIGITAL TWIN' : '● PROCEDURAL TEST'}
+                </button>
+
+                <button
+                  type="button"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setUploadModalOpen(true);
+                  }}
+                  title="Upload a new indoor walkthrough video to generate a custom 3D digital twin"
+                  className="pointer-events-auto text-[10px] tracking-wider uppercase font-bold px-2.5 py-1 rounded bg-gradient-to-r from-cyan-950 to-blue-950 hover:from-cyan-900 hover:to-blue-900 border border-cyan-400/50 text-cyan-300 transition-all cursor-pointer flex items-center gap-1.5 shadow-sm hover:border-cyan-300"
+                >
+                  <UploadCloud size={12} className="text-cyan-400" />
+                  + UPLOAD VIDEO
                 </button>
               </div>
             </div>
@@ -210,18 +236,33 @@ export const GameHUD: React.FC<GameHUDProps> = ({ onPlay }) => {
             <p className="text-sm text-slate-300 mb-6 leading-relaxed">
               Explore the reconstructed 3-floor building. Climb stairs or use elevators, navigate to rooms, and interact with the PARKAR AI assistant.
             </p>
-            <button
-              type="button"
-              id="play-button"
-              onClick={(e) => {
-                e.stopPropagation();
-                startGame();
-                onPlay?.();
-              }}
-              className="px-6 py-3.5 rounded-xl bg-gradient-to-r from-cyan-500 to-blue-600 text-black font-extrabold text-sm uppercase tracking-wider cursor-pointer hover:opacity-95 transition-all transform hover:scale-105 active:scale-95 shadow-lg shadow-cyan-500/30 flex items-center gap-2 outline-none focus:ring-2 focus:ring-cyan-400"
-            >
-              <Footprints size={18} /> Click Anywhere to Play
-            </button>
+            <div className="flex flex-col gap-2.5 w-full">
+              <button
+                type="button"
+                id="play-button"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  startGame();
+                  onPlay?.();
+                }}
+                className="w-full px-6 py-3.5 rounded-xl bg-gradient-to-r from-cyan-500 to-blue-600 text-black font-extrabold text-sm uppercase tracking-wider cursor-pointer hover:opacity-95 transition-all transform hover:scale-105 active:scale-95 shadow-lg shadow-cyan-500/30 flex items-center justify-center gap-2 outline-none focus:ring-2 focus:ring-cyan-400"
+              >
+                <Footprints size={18} /> Explore Demo Digital Twin
+              </button>
+
+              <button
+                type="button"
+                id="upload-button"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setUploadModalOpen(true);
+                }}
+                className="w-full px-6 py-3 rounded-xl bg-gradient-to-r from-emerald-500/20 to-cyan-500/20 border border-cyan-400/40 text-cyan-300 font-bold text-xs uppercase tracking-wider cursor-pointer hover:bg-cyan-500/30 transition-all flex items-center justify-center gap-2 outline-none"
+              >
+                <UploadCloud size={16} className="text-cyan-400" /> Create Digital Twin (Upload Video)
+              </button>
+            </div>
+
             <div className="text-xs text-slate-400 mt-4 flex items-center gap-1.5">
               <span>Press</span>
               <kbd className="px-1.5 py-0.5 rounded bg-slate-800 border border-slate-700 text-white font-mono">ESC</kbd>
@@ -241,6 +282,9 @@ export const GameHUD: React.FC<GameHUDProps> = ({ onPlay }) => {
           Click to resume mouse look • ESC to release cursor
         </div>
       )}
+
+      {/* 7. PHASE 6: VIDEO UPLOAD & RECONSTRUCTION MODAL */}
+      <VideoUploadModal />
     </div>
   );
 };

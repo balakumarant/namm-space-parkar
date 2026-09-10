@@ -1,0 +1,88 @@
+{
+  "status": "success",
+  "pipeline": "PARKAR Real Indoor 3D Reconstruction (Phase 5A.2)",
+  "input_video": {
+    "file": "Screen Recording 2026-09-09 134732.mp4",
+    "segment": "Segment 1 (Frames 0 to 560)",
+    "segment_duration_seconds": 18.67,
+    "resolution": "1892x852",
+    "fps": 30.0
+  },
+  "frames": {
+    "total_extracted": 38,
+    "rejected_blurry": 0,
+    "min_sharpness_threshold": 35.0,
+    "avg_sharpness": 2091.0
+  },
+  "feature_detection": {
+    "detector": "SIFT",
+    "min_features_per_frame": 1493,
+    "max_features_per_frame": 2502,
+    "avg_features_per_frame": 2091.0
+  },
+  "feature_matching": {
+    "method": "BFMatcher(NORM_L2) + Lowe Ratio Test (0.75) + RANSAC",
+    "pairs_evaluated": 37,
+    "avg_raw_matches": 2080.0,
+    "avg_filtered_matches": 700.9,
+    "avg_ransac_inliers": 615.1,
+    "avg_inlier_ratio_pct": 87.8
+  },
+  "sfm": {
+    "registered_frames": 38,
+    "failed_frames": 0,
+    "camera_poses_count": 38,
+    "sparse_points_count": 20054,
+    "coordinate_system": "Y-up, Z-forward, X-lateral (right-handed metric approximation)",
+    "scale_type": "Empirical forward velocity baseline (~0.13m / keyframe, uncalibrated ground truth)"
+  },
+  "dense_reconstruction": {
+    "method": "StereoSGBM Multi-Pair Disparity Triangulation",
+    "dense_points_count": 36083,
+    "reconstruction_coverage": "Full ground floor, entry foyer, staircase area, dining room, living room zone"
+  },
+  "mesh": {
+    "method": "Multi-Zone Architectural 2.5D Delaunay Surface Triangulation directly on point clusters",
+    "original_vertices": 18189,
+    "cleaned_vertices": 18189,
+    "original_triangles": 18257,
+    "cleaned_triangles": 18257,
+    "bounding_dimensions": {
+      "width_meters": 16.28,
+      "height_meters": 7.19,
+      "length_meters": 37.86
+    },
+    "bounds": {
+      "min": [
+        -7.77,
+        -3.2,
+        2.95
+      ],
+      "max": [
+        8.51,
+        4.0,
+        40.82
+      ]
+    },
+    "quality_level": "LEVEL 3 \u2014 Usable architectural mesh",
+    "quality_reason": "Actual geometric surfaces (floor, staircase structure, walls, and columns) reconstructed directly from multi-view point cloud without procedural substitution."
+  },
+  "reconstructed_points": 36083,
+  "outputs": {
+    "sparse_pointcloud": "C:\\Users\\LENOVO\\Downloads\\namma-space-parkar\\reconstruction\\jobs\\recon_259d6ce68f\\output\\pointcloud\\sparse_pointcloud.ply",
+    "dense_pointcloud": "C:\\Users\\LENOVO\\Downloads\\namma-space-parkar\\reconstruction\\jobs\\recon_259d6ce68f\\output\\pointcloud\\dense_pointcloud.ply",
+    "mesh_obj": "C:\\Users\\LENOVO\\Downloads\\namma-space-parkar\\reconstruction\\jobs\\recon_259d6ce68f\\output\\mesh\\building_mesh.obj",
+    "raw_ply": "C:\\Users\\LENOVO\\Downloads\\namma-space-parkar\\reconstruction\\jobs\\recon_259d6ce68f\\output\\building_raw.ply"
+  },
+  "diagnostics": {
+    "os": "Windows-11-10.0.26200-SP0",
+    "python_version": "3.13.14",
+    "colmap_installed": false,
+    "cuda_available": false,
+    "gpu_detected": "No NVIDIA GPU detected on PATH",
+    "opencv_version": "5.0.0",
+    "trimesh_version": "5.1.0",
+    "open3d_installed": false,
+    "ffmpeg_installed": false
+  }
+}

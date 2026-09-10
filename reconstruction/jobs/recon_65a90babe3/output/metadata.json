@@ -1,0 +1,88 @@
+{
+  "building_name": "User Digital Twin (recon_65a90babe3)",
+  "format": "GLB / glTF 2.0 Binary",
+  "units": "meters",
+  "scale_calibrated": true,
+  "scale_factor": 1.0,
+  "dimensions": {
+    "width_meters": 10.74,
+    "height_meters": 6.31,
+    "length_meters": 14.51
+  },
+  "bounds": {
+    "min": [
+      -7.52,
+      -2.34,
+      4.54
+    ],
+    "max": [
+      3.22,
+      3.97,
+      19.05
+    ]
+  },
+  "mesh_stats": {
+    "vertices": 235,
+    "faces": 280,
+    "file_size_bytes": 8092
+  },
+  "floors": [
+    {
+      "floor": 1,
+      "elevation_meters": 0.0,
+      "height_meters": 6.31,
+      "walkable_surface": {
+        "min_x": -7.52,
+        "max_x": 3.22,
+        "min_z": 4.54,
+        "max_z": 19.05
+      }
+    }
+  ],
+  "rooms": [
+    {
+      "id": "recon_65a90babe3_entrance",
+      "name": "Entrance & Foyer Zone",
+      "floor": 1,
+      "center": [
+        0.0,
+        0.0,
+        6.54
+      ],
+      "door": [
+        0.0,
+        0.0,
+        5.54
+      ]
+    },
+    {
+      "id": "recon_65a90babe3_main_hall",
+      "name": "Main Reconstructed Space",
+      "floor": 1,
+      "center": [
+        0.0,
+        0.0,
+        11.8
+      ],
+      "door": [
+        0.0,
+        0.0,
+        10.8
+      ]
+    }
+  ],
+  "pois": [
+    {
+      "id": "poi_recon_65a90babe3_entry",
+      "name": "User Upload Entry",
+      "floor": 1,
+      "category": "entrance",
+      "position": {
+        "x": 0.0,
+        "y": 0.0,
+        "z": 6.54
+      },
+      "description": "Spawn point inside user reconstructed digital twin"
+    }
+  ]
+}

@@ -1,0 +1,49 @@
+{
+  "job_id": "recon_d9545711de",
+  "original_filename": "Screen Recording 2026-09-10 004816.mp4",
+  "status": "SUCCESS",
+  "pipeline_type": "VIDEO_DERIVED_ARCHITECTURAL_RECONSTRUCTION",
+  "video_resolution": "1892x852",
+  "total_extracted_keyframes": 38,
+  "registered_keyframes": 38,
+  "camera_poses_recovered": 38,
+  "candidate_3d_points": 18849,
+  "valid_inlier_points": 18566,
+  "outliers_filtered": 283,
+  "avg_reprojection_error_px": 0.49,
+  "planes_detected": {
+    "floor_plane": [
+      0.059,
+      0.991,
+      -0.124,
+      0.781
+    ],
+    "floor_elevation_meters": -0.79,
+    "ceiling_elevation_meters": 3.59,
+    "wall_height_meters": 4.38
+  },
+  "mesh_geometry": {
+    "vertices": 352,
+    "faces": 528,
+    "max_edge_length_meters": 31.37,
+    "has_nan_inf": false,
+    "bounding_box_meters": {
+      "min": [
+        -1.75,
+        -1.04,
+        -1.25
+      ],
+      "max": [
+        2.81,
+        3.79,
+        30.32
+      ]
+    },
+    "dimensions_meters": {
+      "width_x": 4.56,
+      "height_y": 4.83,
+      "length_z": 31.57
+    }
+  },
+  "glb_file_size_bytes": 12892
+}

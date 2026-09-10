@@ -1,0 +1,102 @@
+{
+  "building_name": "User Digital Twin (recon_3879bb3f94)",
+  "format": "GLB / glTF 2.0 Binary",
+  "pipeline_version": "v5C.2-Architectural-Watertight",
+  "units": "meters",
+  "original_filename": "indoor_building.mp4",
+  "scale_calibrated": true,
+  "scale_factor": 1.0,
+  "dimensions": {
+    "width_meters": 26.55,
+    "height_meters": 3.45,
+    "length_meters": 27.3
+  },
+  "bounds": {
+    "min": [
+      -24.66,
+      -0.25,
+      -1.25
+    ],
+    "max": [
+      1.89,
+      3.2,
+      26.05
+    ]
+  },
+  "mesh_stats": {
+    "vertices": 56,
+    "faces": 84,
+    "file_size_bytes": 2840
+  },
+  "floors": [
+    {
+      "floor": 1,
+      "elevation_meters": 0.0,
+      "height_meters": 3.0,
+      "walkable_surface": {
+        "min_x": -24.41,
+        "max_x": 1.64,
+        "min_z": -1.0,
+        "max_z": 25.8
+      }
+    }
+  ],
+  "rooms": [
+    {
+      "id": "recon_3879bb3f94_entrance",
+      "name": "Entrance Portal",
+      "floor": 1,
+      "center": [
+        -11.38,
+        0.0,
+        0.5
+      ],
+      "door": [
+        -11.38,
+        0.0,
+        -0.5
+      ]
+    },
+    {
+      "id": "recon_3879bb3f94_concourse",
+      "name": "Main Hall",
+      "floor": 1,
+      "center": [
+        -11.38,
+        0.0,
+        12.4
+      ],
+      "door": [
+        -11.38,
+        0.0,
+        11.4
+      ]
+    }
+  ],
+  "pois": [
+    {
+      "id": "poi_recon_3879bb3f94_entry",
+      "name": "Digital Twin Spawn Portal",
+      "floor": 1,
+      "category": "entrance",
+      "position": {
+        "x": -11.38,
+        "y": 0.0,
+        "z": 0.5
+      },
+      "description": "Spawn point inside user reconstructed digital twin"
+    },
+    {
+      "id": "poi_recon_3879bb3f94_gallery",
+      "name": "Architectural Vista",
+      "floor": 1,
+      "category": "viewpoint",
+      "position": {
+        "x": -11.38,
+        "y": 0.0,
+        "z": 12.4
+      },
+      "description": "Reconstructed hall viewpoint"
+    }
+  ]
+}

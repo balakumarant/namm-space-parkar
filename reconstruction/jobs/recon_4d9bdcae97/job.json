@@ -1,0 +1,38 @@
+{
+  "job_id": "recon_4d9bdcae97",
+  "filename": "test_corridor_walkthrough.mp4",
+  "file_size_bytes": 1890757,
+  "created_at": 1788984533.7183423,
+  "updated_at": 1788984533.9314048,
+  "status": "FAILED",
+  "progress_pct": 75,
+  "stage_description": "Pipeline failed: cannot access local variable 'job' where it is not associated with a value",
+  "stages": {
+    "upload": {
+      "status": "COMPLETED",
+      "progress": 100
+    },
+    "extraction": {
+      "status": "IN_PROGRESS",
+      "progress": 20
+    },
+    "feature_matching": {
+      "status": "IN_PROGRESS",
+      "progress": 40
+    },
+    "reconstruction": {
+      "status": "IN_PROGRESS",
+      "progress": 60
+    },
+    "mesh_generation": {
+      "status": "IN_PROGRESS",
+      "progress": 80
+    },
+    "validation": {
+      "status": "PENDING",
+      "progress": 0
+    }
+  },
+  "error": "cannot access local variable 'job' where it is not associated with a value",
+  "result": null
+}

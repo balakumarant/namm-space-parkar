@@ -1,0 +1,38 @@
+{
+  "job_id": "recon_1b622f0338",
+  "filename": "test_corridor_walkthrough.mp4",
+  "file_size_bytes": 1890757,
+  "created_at": 1788984622.8546276,
+  "updated_at": 1788984624.0119998,
+  "status": "FAILED",
+  "progress_pct": 75,
+  "stage_description": "Pipeline failed: Object of type bool is not JSON serializable",
+  "stages": {
+    "upload": {
+      "status": "COMPLETED",
+      "progress": 100
+    },
+    "extraction": {
+      "status": "IN_PROGRESS",
+      "progress": 20
+    },
+    "feature_matching": {
+      "status": "IN_PROGRESS",
+      "progress": 40
+    },
+    "reconstruction": {
+      "status": "IN_PROGRESS",
+      "progress": 60
+    },
+    "mesh_generation": {
+      "status": "IN_PROGRESS",
+      "progress": 80
+    },
+    "validation": {
+      "status": "PENDING",
+      "progress": 0
+    }
+  },
+  "error": "Object of type bool is not JSON serializable",
+  "result": null
+}

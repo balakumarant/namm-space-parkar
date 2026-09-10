@@ -1,0 +1,49 @@
+{
+  "job_id": "recon_229f0a569e",
+  "original_filename": "test_corridor_walkthrough.mp4",
+  "status": "SUCCESS",
+  "pipeline_type": "VIDEO_DERIVED_ARCHITECTURAL_RECONSTRUCTION",
+  "video_resolution": "640x480",
+  "total_extracted_keyframes": 8,
+  "registered_keyframes": 8,
+  "camera_poses_recovered": 8,
+  "candidate_3d_points": 217,
+  "valid_inlier_points": 207,
+  "outliers_filtered": 10,
+  "avg_reprojection_error_px": 0.35,
+  "planes_detected": {
+    "floor_plane": [
+      -0.15,
+      0.972,
+      -0.179,
+      -0.147
+    ],
+    "floor_elevation_meters": 0.15,
+    "ceiling_elevation_meters": 4.65,
+    "wall_height_meters": 4.5
+  },
+  "mesh_geometry": {
+    "vertices": 304,
+    "faces": 456,
+    "max_edge_length_meters": 28.26,
+    "has_nan_inf": false,
+    "bounding_box_meters": {
+      "min": [
+        -9.03,
+        -0.1,
+        -1.25
+      ],
+      "max": [
+        1.95,
+        4.85,
+        25.5
+      ]
+    },
+    "dimensions_meters": {
+      "width_x": 10.98,
+      "height_y": 4.95,
+      "length_z": 26.75
+    }
+  },
+  "glb_file_size_bytes": 11272
+}

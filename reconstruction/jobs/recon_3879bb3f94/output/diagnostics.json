@@ -1,0 +1,49 @@
+{
+  "job_id": "recon_3879bb3f94",
+  "original_filename": "indoor_building.mp4",
+  "status": "SUCCESS",
+  "pipeline_type": "VIDEO_DERIVED_ARCHITECTURAL_RECONSTRUCTION",
+  "video_resolution": "1280x720",
+  "total_extracted_keyframes": 10,
+  "registered_keyframes": 10,
+  "camera_poses_recovered": 10,
+  "candidate_3d_points": 675,
+  "valid_inlier_points": 643,
+  "outliers_filtered": 32,
+  "avg_reprojection_error_px": 0.19,
+  "planes_detected": {
+    "floor_plane": [
+      0.002,
+      0.976,
+      0.216,
+      -0.001
+    ],
+    "floor_elevation_meters": 0.0,
+    "ceiling_elevation_meters": 3.0,
+    "wall_height_meters": 3.0
+  },
+  "mesh_geometry": {
+    "vertices": 56,
+    "faces": 84,
+    "max_edge_length_meters": 37.37,
+    "has_nan_inf": false,
+    "bounding_box_meters": {
+      "min": [
+        -24.66,
+        -0.25,
+        -1.25
+      ],
+      "max": [
+        1.89,
+        3.2,
+        26.05
+      ]
+    },
+    "dimensions_meters": {
+      "width_x": 26.55,
+      "height_y": 3.45,
+      "length_z": 27.3
+    }
+  },
+  "glb_file_size_bytes": 2840
+}

@@ -1,0 +1,66 @@
+{
+  "job_id": "recon_229f0a569e",
+  "filename": "test_corridor_walkthrough.mp4",
+  "file_size_bytes": 1890757,
+  "created_at": 1788984671.2135265,
+  "updated_at": 1788984672.3704596,
+  "status": "COMPLETED",
+  "progress_pct": 100,
+  "stage_description": "3D Digital Twin successfully reconstructed and validated!",
+  "stages": {
+    "upload": {
+      "status": "COMPLETED",
+      "progress": 100
+    },
+    "extraction": {
+      "status": "COMPLETED",
+      "progress": 100
+    },
+    "feature_matching": {
+      "status": "COMPLETED",
+      "progress": 100
+    },
+    "reconstruction": {
+      "status": "COMPLETED",
+      "progress": 100
+    },
+    "mesh_generation": {
+      "status": "COMPLETED",
+      "progress": 100
+    },
+    "validation": {
+      "status": "COMPLETED",
+      "progress": 100
+    }
+  },
+  "error": null,
+  "result": {
+    "glb_url": "/api/reconstruction/model/recon_229f0a569e/building.glb",
+    "metadata_url": "/api/reconstruction/model/recon_229f0a569e/metadata.json",
+    "diagnostics_url": "/api/reconstruction/diagnostics/recon_229f0a569e",
+    "mesh_stats": {
+      "file_size_bytes": 11272,
+      "vertices": 304,
+      "faces": 456,
+      "extents": [
+        10.98065733909607,
+        4.950000189244747,
+        26.747577667236328
+      ],
+      "bounds": [
+        [
+          -9.030193328857422,
+          -0.09918584674596786,
+          -1.25
+        ],
+        [
+          1.9504640102386475,
+          4.850814342498779,
+          25.497577667236328
+        ]
+      ],
+      "is_valid": true
+    },
+    "extracted_frames": 8
+  }
+}

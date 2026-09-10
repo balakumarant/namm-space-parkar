@@ -317,6 +317,95 @@ export function computeReconstructedRoutes(
   startZ: number,
   destAnchorOrNodeId: string
 ): RouteResponse {
+  // Check for custom corridor POIs
+  const customCorridorPOIs: { [key: string]: { name: string; x: number; y: number; z: number } } = {
+    'poi_recon_entry': { name: 'Corridor Entrance Portal (Bldg E18)', x: 0.0, y: 0.0, z: 1.5 },
+    'poi_recon_door1': { name: 'Office Door E18-A (Right Wall)', x: 1.25, y: 0.0, z: 5.2 },
+    'poi_recon_door2': { name: 'Tech Support Hub (Right Wall)', x: 1.25, y: 0.0, z: 13.5 },
+    'poi_recon_door3': { name: 'Logistics Service Door (Double Metal)', x: 1.25, y: 0.0, z: 23.0 },
+    'poi_recon_vista': { name: 'Far End Corridor Vista', x: 0.0, y: 0.0, z: 24.0 },
+  };
+
+  const matchedCustomKey = Object.keys(customCorridorPOIs).find(
+    (k) => destAnchorOrNodeId === k || destAnchorOrNodeId.includes(k.replace('poi_recon_', ''))
+  );
+
+  if (matchedCustomKey) {
+    const target = customCorridorPOIs[matchedCustomKey];
+    const waypoints: Waypoint[] = [
+      {
+        id: 'start_pos',
+        name: 'Current Location',
+        floor: 1,
+        type: 'corridor',
+        x: startX,
+        y: startY,
+        z: startZ,
+      },
+      {
+        id: 'corridor_aisle_start',
+        name: 'Central Corridor Path',
+        floor: 1,
+        type: 'corridor',
+        x: 0.0,
+        y: 0.0,
+        z: startZ,
+      },
+      {
+        id: 'corridor_aisle_target',
+        name: `${target.name} Concourse`,
+        floor: 1,
+        type: 'corridor',
+        x: 0.0,
+        y: 0.0,
+        z: target.z,
+      },
+      {
+        id: matchedCustomKey,
+        name: target.name,
+        floor: 1,
+        type: 'room',
+        x: target.x,
+        y: target.y,
+        z: target.z,
+      },
+    ];
+
+    let totalDist = 0;
+    for (let i = 0; i < waypoints.length - 1; i++) {
+      const dx = waypoints[i + 1].x - waypoints[i].x;
+      const dz = waypoints[i + 1].z - waypoints[i].z;
+      totalDist += Math.sqrt(dx * dx + dz * dz);
+    }
+
+    const instructions = [
+      `Start at current location inside corridor.`,
+      `Follow the central illuminated aisle under exposed ceiling pipes.`,
+      `Proceed straight towards ${target.name}.`,
+      `Arrive at ${target.name}.`,
+    ];
+
+    const fastestRoute: RouteOption = {
+      id: 'rec_route_custom_fastest',
+      title: 'Corridor Direct Route',
+      profile: 'fastest',
+      total_distance_meters: Math.round(totalDist * 10) / 10,
+      estimated_time_seconds: Math.max(2, Math.round(totalDist / 1.35)),
+      floor_transitions: [1],
+      uses_stairs: false,
+      uses_elevator: false,
+      waypoints,
+      instructions,
+    };
+
+    return {
+      origin_node: 'start_pos',
+      destination_node: matchedCustomKey,
+      destination_name: target.name,
+      routes: [fastestRoute],
+    };
+  }
+
   // Resolve destination anchor to graph node ID
   const anchor = RECONSTRUCTED_POI_ANCHORS.find(
     (a) => a.poiId === destAnchorOrNodeId || a.navigationNodeId === destAnchorOrNodeId

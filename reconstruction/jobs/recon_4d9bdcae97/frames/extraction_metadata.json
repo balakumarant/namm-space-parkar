@@ -1,0 +1,77 @@
+{
+  "source_video": "C:\\Users\\LENOVO\\Downloads\\namma-space-parkar\\reconstruction\\jobs\\recon_4d9bdcae97\\input\\test_corridor_walkthrough.mp4",
+  "total_source_frames": 120,
+  "source_fps": 30.0,
+  "segment": {
+    "start_frame": 0,
+    "end_frame": 119,
+    "segment_duration_seconds": 4.0
+  },
+  "sampling": {
+    "target_fps": 2.0,
+    "frame_step": 15,
+    "min_sharpness_threshold": 5.0,
+    "max_frames_budget": 60
+  },
+  "frames_extracted": 8,
+  "frames_skipped_blur": 0,
+  "frames_skipped_interval": 112,
+  "average_sharpness": 3793.97,
+  "sharpness_stats": {
+    "average": 3793.97,
+    "min": 3631.32,
+    "max": 3976.2
+  },
+  "frame_width": 640,
+  "frame_height": 480,
+  "extracted_frames": [
+    {
+      "frame_file": "frame_0001.jpg",
+      "source_frame_idx": 0,
+      "timestamp_sec": 0.0,
+      "sharpness": 3631.32
+    },
+    {
+      "frame_file": "frame_0002.jpg",
+      "source_frame_idx": 15,
+      "timestamp_sec": 0.5,
+      "sharpness": 3841.7
+    },
+    {
+      "frame_file": "frame_0003.jpg",
+      "source_frame_idx": 30,
+      "timestamp_sec": 1.0,
+      "sharpness": 3976.2
+    },
+    {
+      "frame_file": "frame_0004.jpg",
+      "source_frame_idx": 45,
+      "timestamp_sec": 1.5,
+      "sharpness": 3882.14
+    },
+    {
+      "frame_file": "frame_0005.jpg",
+      "source_frame_idx": 60,
+      "timestamp_sec": 2.0,
+      "sharpness": 3680.2
+    },
+    {
+      "frame_file": "frame_0006.jpg",
+      "source_frame_idx": 75,
+      "timestamp_sec": 2.5,
+      "sharpness": 3847.3
+    },
+    {
+      "frame_file": "frame_0007.jpg",
+      "source_frame_idx": 90,
+      "timestamp_sec": 3.0,
+      "sharpness": 3685.25
+    },
+    {
+      "frame_file": "frame_0008.jpg",
+      "source_frame_idx": 105,
+      "timestamp_sec": 3.5,
+      "sharpness": 3807.62
+    }
+  ]
+}

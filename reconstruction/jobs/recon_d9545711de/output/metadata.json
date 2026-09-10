@@ -1,0 +1,102 @@
+{
+  "building_name": "User Digital Twin (recon_d9545711de)",
+  "format": "GLB / glTF 2.0 Binary",
+  "pipeline_version": "v5C.2-Architectural-Watertight",
+  "units": "meters",
+  "original_filename": "Screen Recording 2026-09-10 004816.mp4",
+  "scale_calibrated": true,
+  "scale_factor": 1.0,
+  "dimensions": {
+    "width_meters": 4.56,
+    "height_meters": 4.83,
+    "length_meters": 31.57
+  },
+  "bounds": {
+    "min": [
+      -1.75,
+      -1.04,
+      -1.25
+    ],
+    "max": [
+      2.81,
+      3.79,
+      30.32
+    ]
+  },
+  "mesh_stats": {
+    "vertices": 352,
+    "faces": 528,
+    "file_size_bytes": 12892
+  },
+  "floors": [
+    {
+      "floor": 1,
+      "elevation_meters": -0.79,
+      "height_meters": 4.38,
+      "walkable_surface": {
+        "min_x": -1.5,
+        "max_x": 2.56,
+        "min_z": -1.0,
+        "max_z": 30.07
+      }
+    }
+  ],
+  "rooms": [
+    {
+      "id": "recon_d9545711de_entrance",
+      "name": "Entrance Portal",
+      "floor": 1,
+      "center": [
+        0.53,
+        -0.79,
+        0.5
+      ],
+      "door": [
+        0.53,
+        -0.79,
+        -0.5
+      ]
+    },
+    {
+      "id": "recon_d9545711de_concourse",
+      "name": "Main Hall",
+      "floor": 1,
+      "center": [
+        0.53,
+        -0.79,
+        14.53
+      ],
+      "door": [
+        0.53,
+        -0.79,
+        13.53
+      ]
+    }
+  ],
+  "pois": [
+    {
+      "id": "poi_recon_d9545711de_entry",
+      "name": "Digital Twin Spawn Portal",
+      "floor": 1,
+      "category": "entrance",
+      "position": {
+        "x": 0.53,
+        "y": -0.79,
+        "z": 0.5
+      },
+      "description": "Spawn point inside user reconstructed digital twin"
+    },
+    {
+      "id": "poi_recon_d9545711de_gallery",
+      "name": "Architectural Vista",
+      "floor": 1,
+      "category": "viewpoint",
+      "position": {
+        "x": 0.53,
+        "y": -0.79,
+        "z": 14.53
+      },
+      "description": "Reconstructed hall viewpoint"
+    }
+  ]
+}
