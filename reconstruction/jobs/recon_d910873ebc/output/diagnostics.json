@@ -1,0 +1,53 @@
+{
+  "job_id": "recon_d910873ebc",
+  "original_filename": "test_corridor_walkthrough.mp4",
+  "status": "SUCCESS",
+  "pipeline_type": "VIDEO_GROUND_TRUTH_CORRIDOR_RECONSTRUCTION",
+  "video_resolution": "640x480",
+  "total_extracted_keyframes": 8,
+  "registered_keyframes": 8,
+  "camera_poses_recovered": 8,
+  "candidate_3d_points": 211,
+  "valid_inlier_points": 200,
+  "outliers_filtered": 11,
+  "avg_reprojection_error_px": 0.36,
+  "corridor_dimensions": {
+    "floor_elevation_meters": -0.77,
+    "ceiling_elevation_meters": 4.23,
+    "clearance_height_meters": 5.0,
+    "width_meters": 9.41,
+    "length_meters": 19.58,
+    "walkable_aisle_width_meters": 1.6
+  },
+  "architectural_features_synthesized": [
+    "Continuous photogrammetric floor slab with sampled video color",
+    "Continuous boundary perimeter walls with sampled video colors",
+    "Ceiling slab enclosure",
+    "Direct 2.5D Delaunay surface meshing from multi-view point cloud",
+    "Entrance portal enclosure"
+  ],
+  "mesh_geometry": {
+    "vertices": 204,
+    "faces": 272,
+    "max_edge_length_meters": 22.26,
+    "has_nan_inf": false,
+    "bounding_box_meters": {
+      "min": [
+        -7.82,
+        -0.97,
+        -0.7
+      ],
+      "max": [
+        2.09,
+        4.72,
+        19.28
+      ]
+    },
+    "dimensions_meters": {
+      "width_x": 9.91,
+      "height_y": 5.69,
+      "length_z": 19.98
+    }
+  },
+  "glb_file_size_bytes": 7492
+}

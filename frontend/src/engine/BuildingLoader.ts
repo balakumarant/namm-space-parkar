@@ -79,7 +79,7 @@ export class BuildingLoader implements IBuildingLoader {
       const box = new THREE.Box3().setFromObject(this.reconstructedModel);
       const centerX = (box.min.x + box.max.x) / 2.0;
       const spawnZ = box.min.z + 1.8;
-      const spawnY = Math.max(0.5, box.min.y + 0.95);
+      const spawnY = Math.max(1.05, (box.min.y ?? 0.0) + 1.05);
       return { x: centerX, y: spawnY, z: spawnZ };
     }
     if (this.buildingMode === 'reconstructed') {
@@ -370,6 +370,10 @@ export class BuildingLoader implements IBuildingLoader {
         const targetMeta = this.customMetadataUrl || undefined;
         await this.loadReconstructedBuilding(targetGlb, targetMeta, debugVisualizer);
       } catch (err) {
+        if (this.customGlbUrl) {
+          console.error('[Custom Reconstruction Error] Failed to load custom 3D model:', err);
+          throw err;
+        }
         console.warn('[Reconstruction Fallback] Reconstructed building failed to load, falling back to procedural building:', err);
         this.buildingMode = 'procedural';
         await this.loadProceduralBuilding();
@@ -410,9 +414,13 @@ export class BuildingLoader implements IBuildingLoader {
     const { GLTFLoader } = await import('three/examples/jsm/loaders/GLTFLoader.js');
     const loader = new GLTFLoader();
 
+    const isCustom = Boolean(this.customGlbUrl);
+    const finalGlbUrl = isCustom && !glbUrl.includes('?t=') ? `${glbUrl}${glbUrl.includes('?') ? '&' : '?'}t=${Date.now()}` : glbUrl;
+    const finalMetaUrl = isCustom && !metadataUrl.includes('?t=') ? `${metadataUrl}${metadataUrl.includes('?') ? '&' : '?'}t=${Date.now()}` : metadataUrl;
+
     // 1. Fetch metadata if available
     try {
-      const res = await fetch(metadataUrl);
+      const res = await fetch(finalMetaUrl);
       if (res.ok) {
         this.reconstructedMetadata = await res.json();
       }
@@ -422,14 +430,11 @@ export class BuildingLoader implements IBuildingLoader {
 
     // 2. Load GLB model
     const gltf = await new Promise<any>((resolve, reject) => {
-      loader.load(glbUrl, resolve, undefined, reject);
+      loader.load(finalGlbUrl, resolve, undefined, reject);
     });
 
     const model = gltf.scene || gltf.scenes[0];
     this.reconstructedModel = model;
-
-    // Determine if this is a custom user reconstruction
-    const isCustom = Boolean(this.customGlbUrl);
 
     if (isCustom) {
       model.position.set(0, 0, 0);
@@ -528,32 +533,16 @@ export class BuildingLoader implements IBuildingLoader {
 
       // Custom corridor perimeter walls (placed at corridor boundaries)
       const wallH = Math.max(2.0, (modelBox.max.y - modelBox.min.y));
-      // Left boundary wall
-      this.addStaticBox(modelBox.min.x - 0.1, floorY + wallH / 2, floorCenterZ, 0.15, wallH / 2, floorHalfL);
-      // Right boundary wall
-      this.addStaticBox(modelBox.max.x + 0.1, floorY + wallH / 2, floorCenterZ, 0.15, wallH / 2, floorHalfL);
-      // South entrance back wall
-      this.addStaticBox(floorCenterX, floorY + wallH / 2, modelBox.min.z - 0.3, floorHalfW, wallH / 2, 0.15);
-      // North far end wall
-      this.addStaticBox(floorCenterX, floorY + wallH / 2, modelBox.max.z + 0.3, floorHalfW, wallH / 2, 0.15);
+      // Left boundary wall (inner face flush with modelBox.min.x)
+      this.addStaticBox(modelBox.min.x - 0.15, floorY + wallH / 2, floorCenterZ, 0.15, wallH / 2, floorHalfL);
+      // Right boundary wall (inner face flush with modelBox.max.x)
+      this.addStaticBox(modelBox.max.x + 0.15, floorY + wallH / 2, floorCenterZ, 0.15, wallH / 2, floorHalfL);
+      // South entrance back wall (inner face flush with modelBox.min.z)
+      this.addStaticBox(floorCenterX, floorY + wallH / 2, modelBox.min.z - 0.15, floorHalfW, wallH / 2, 0.15);
+      // North far end wall (inner face flush with modelBox.max.z)
+      this.addStaticBox(floorCenterX, floorY + wallH / 2, modelBox.max.z + 0.15, floorHalfW, wallH / 2, 0.15);
 
-      // Custom User Digital Twin Badges matching the reconstructed corridor
-      const customBadge = this.createFloatingTextBadge('BUILDING E18 CORRIDOR', 2.4, 0.50, 0x00f2fe, true);
-      customBadge.position.set(floorCenterX, floorY + 2.5, modelBox.min.z + 2.2);
-      customBadge.rotation.y = Math.PI;
-      this.buildingGroup.add(customBadge);
-
-      const signDoor1 = this.createFloatingTextBadge('OFFICE DOOR E18-A', 1.8, 0.45, 0x10b981, false);
-      signDoor1.position.set(modelBox.max.x - 0.2, floorY + 2.40, 5.2);
-      signDoor1.rotation.y = -Math.PI / 2;
-      this.buildingGroup.add(signDoor1);
-
-      const signDoor2 = this.createFloatingTextBadge('TECH SUPPORT HUB', 1.8, 0.45, 0x3b82f6, false);
-      signDoor2.position.set(modelBox.max.x - 0.2, floorY + 2.40, 13.5);
-      signDoor2.rotation.y = -Math.PI / 2;
-      this.buildingGroup.add(signDoor2);
-
-      // Register dynamic interactive zones from metadata POIs
+      // Register dynamic interactive zones from metadata POIs (without artificial floating text banners)
       if (this.reconstructedMetadata?.pois && Array.isArray(this.reconstructedMetadata.pois)) {
         this.interactiveZones = this.reconstructedMetadata.pois.map((poi: any) => ({
           id: poi.id,
@@ -567,11 +556,11 @@ export class BuildingLoader implements IBuildingLoader {
         this.interactiveZones = [
           {
             id: 'custom_zone_entrance',
-            name: 'Building E18 Entrance Portal',
+            name: 'Reconstructed Space Entrance',
             type: 'info',
             position: { x: floorCenterX, y: floorY, z: modelBox.min.z + 1.8 },
             radius: 3.0,
-            prompt: 'Press [E] to Inspect Reconstructed Corridor',
+            prompt: 'Press [E] to Inspect Reconstructed Space',
           }
         ];
       }
@@ -669,17 +658,17 @@ export class BuildingLoader implements IBuildingLoader {
         // Obstacles
         dbg.addCollisionBox(-1.5, 2.0, 22.0, 0.6, 2.0, 0.6, 0xff00ff);
         dbg.addCollisionBox(0.0, 0.45, 34.0, 1.2, 0.45, 1.8, 0xff00ff);
+
+        // Reconstructed Navigation Graph & POI Anchors (demo building only)
+        dbg.visualizeReconstructedGraph(
+          RECONSTRUCTED_GRAPH_NODES,
+          RECONSTRUCTED_GRAPH_EDGES,
+          RECONSTRUCTED_POI_ANCHORS
+        );
       }
       // Axes and grid
       dbg.addAxes(5.0);
       dbg.addFloorGrid(60, 60, 0.0);
-
-      // Reconstructed Navigation Graph & POI Anchors
-      dbg.visualizeReconstructedGraph(
-        RECONSTRUCTED_GRAPH_NODES,
-        RECONSTRUCTED_GRAPH_EDGES,
-        RECONSTRUCTED_POI_ANCHORS
-      );
     }
   }
 

@@ -43,8 +43,9 @@ export const App: React.FC = () => {
       const params = new URLSearchParams(window.location.search);
       const customJob = params.get('job');
       if (customJob) {
-        const glbUrl = `http://127.0.0.1:8000/api/reconstruction/model/${customJob}/building.glb`;
-        const metaUrl = `http://127.0.0.1:8000/api/reconstruction/model/${customJob}/metadata.json`;
+        const t = Date.now();
+        const glbUrl = `http://127.0.0.1:8000/api/reconstruction/model/${customJob}/building.glb?t=${t}`;
+        const metaUrl = `http://127.0.0.1:8000/api/reconstruction/model/${customJob}/metadata.json?t=${t}`;
         engine.buildingLoader.setCustomModel(glbUrl, metaUrl);
         engine.buildingLoader.setMode('reconstructed');
         useGameStore.getState().setCustomModel(customJob, glbUrl, metaUrl);
@@ -90,9 +91,32 @@ export const App: React.FC = () => {
 
         const customJob = params.get('job');
         if (customJob) {
-          const glbUrl = `http://127.0.0.1:8000/api/reconstruction/model/${customJob}/building.glb`;
-          const metaUrl = `http://127.0.0.1:8000/api/reconstruction/model/${customJob}/metadata.json`;
-          useGameStore.getState().setCustomModel(customJob, glbUrl, metaUrl);
+          const t = Date.now();
+          const glbUrl = `http://127.0.0.1:8000/api/reconstruction/model/${customJob}/building.glb?t=${t}`;
+          const metaUrl = `http://127.0.0.1:8000/api/reconstruction/model/${customJob}/metadata.json?t=${t}`;
+          
+          fetch(`http://127.0.0.1:8000/api/reconstruction/diagnostics/${customJob}`).then(async (res) => {
+            let stats = null;
+            if (res.ok) {
+              const diag = await res.json();
+              stats = {
+                jobId: customJob,
+                filename: diag.original_filename || 'walkthrough.mp4',
+                vertices: diag.mesh_geometry?.vertices,
+                faces: diag.mesh_geometry?.faces,
+                dimensions: {
+                  width: diag.mesh_geometry?.dimensions_meters?.width_x || 0,
+                  height: diag.mesh_geometry?.dimensions_meters?.height_y || 0,
+                  length: diag.mesh_geometry?.dimensions_meters?.length_z || 0,
+                },
+                status: 'RECONSTRUCTED (VIDEO-DERIVED)',
+                diagnostics: diag,
+              };
+            }
+            useGameStore.getState().setCustomModel(customJob, glbUrl, metaUrl, stats);
+          }).catch(() => {
+            useGameStore.getState().setCustomModel(customJob, glbUrl, metaUrl);
+          });
           useGameStore.getState().setNotification(`Loaded Custom User Digital Twin (${customJob})`);
         }
 

@@ -1,11 +1,12 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useGameStore } from '../../stores/useGameStore';
-import { Layers, Compass, Footprints, Eye, UploadCloud } from 'lucide-react';
+import { Layers, Compass, Footprints, Eye, UploadCloud, Activity } from 'lucide-react';
 import { RoutePanel } from './RoutePanel';
 import { TurnByTurnCard } from './TurnByTurnCard';
 import { Minimap } from './Minimap';
 import { ParkarChatDrawer } from '../ParkarChat/ParkarChatDrawer';
 import { VideoUploadModal } from '../Upload/VideoUploadModal';
+import { DiagnosticsPanel } from './DiagnosticsPanel';
 
 interface GameHUDProps {
   onPlay?: () => void;
@@ -24,6 +25,9 @@ export const GameHUD: React.FC<GameHUDProps> = ({ onPlay }) => {
   const setBuildingMode = useGameStore((state) => state.setBuildingMode);
   const setUploadModalOpen = useGameStore((state) => state.setUploadModalOpen);
   const customModelJobId = useGameStore((state) => state.customModelJobId);
+  const customModelStats = useGameStore((state) => state.customModelStats);
+  const setCustomModel = useGameStore((state) => state.setCustomModel);
+  const [isDiagnosticsOpen, setIsDiagnosticsOpen] = useState(false);
 
   // Auto-dismiss notification after 3.5 seconds
   const setNotification = useGameStore((state) => state.setNotification);
@@ -68,9 +72,17 @@ export const GameHUD: React.FC<GameHUDProps> = ({ onPlay }) => {
                   type="button"
                   onClick={(e) => {
                     e.stopPropagation();
-                    const newMode = buildingMode === 'reconstructed' ? 'procedural' : 'reconstructed';
-                    setBuildingMode(newMode);
-                    setNotification(`Switched environment to ${newMode === 'reconstructed' ? 'REAL DIGITAL TWIN' : 'PROCEDURAL BUILDING'}`);
+                    if (customModelJobId) {
+                      setCustomModel(null, null, null);
+                      setBuildingMode('reconstructed');
+                      setNotification('Switched to DEMO REAL DIGITAL TWIN');
+                    } else if (buildingMode === 'reconstructed') {
+                      setBuildingMode('procedural');
+                      setNotification('Switched environment to PROCEDURAL BUILDING');
+                    } else {
+                      setBuildingMode('reconstructed');
+                      setNotification('Switched environment to REAL DIGITAL TWIN');
+                    }
                   }}
                   title="Click to toggle between Reconstructed Digital Twin and Procedural Building"
                   className="pointer-events-auto text-[10px] tracking-wider uppercase font-bold px-2.5 py-1 rounded bg-cyan-950/90 hover:bg-cyan-900 border border-cyan-500/40 text-cyan-300 transition-all cursor-pointer flex items-center gap-1.5 shadow-sm"
@@ -283,8 +295,83 @@ export const GameHUD: React.FC<GameHUDProps> = ({ onPlay }) => {
         </div>
       )}
 
-      {/* 7. PHASE 6: VIDEO UPLOAD & RECONSTRUCTION MODAL */}
+      {/* 7. DIAGNOSTIC WATERMARK HUD (Active for Reconstructed Video Models) */}
+      {customModelJobId && (
+        <div 
+          id="diagnostic-hud-badge"
+          className="absolute bottom-6 left-6 z-30 pointer-events-auto glass-panel p-3 border-cyan-400/50 bg-slate-950/90 text-xs font-mono shadow-2xl rounded-xl flex flex-col gap-1.5 border-l-4 border-l-cyan-400 max-w-sm backdrop-blur-md animate-fade-in"
+        >
+          <div className="flex items-center justify-between gap-3 border-b border-slate-800 pb-1.5 mb-0.5">
+            <span className="text-[10px] uppercase font-bold tracking-wider text-cyan-400 flex items-center gap-1.5">
+              <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+              RECONSTRUCTED (VIDEO-DERIVED)
+            </span>
+            <span className="text-[10px] text-slate-500 font-mono">PARKAR SfM</span>
+          </div>
+
+          <div className="text-slate-300 flex justify-between gap-2">
+            <span className="text-slate-400">Job ID:</span>
+            <span className="text-white font-bold tracking-wide">{customModelJobId}</span>
+          </div>
+
+          <div className="text-slate-300 flex justify-between gap-2">
+            <span className="text-slate-400">Source Video:</span>
+            <span className="text-cyan-300 truncate max-w-[180px]" title={customModelStats?.filename || 'walkthrough.mp4'}>
+              {customModelStats?.filename || 'walkthrough.mp4'}
+            </span>
+          </div>
+
+          {customModelStats?.vertices !== undefined && (
+            <div className="text-slate-300 flex justify-between gap-2">
+              <span className="text-slate-400">Mesh Stats:</span>
+              <span className="text-slate-200">
+                {customModelStats.vertices.toLocaleString()} verts | {customModelStats.faces?.toLocaleString()} tris
+              </span>
+            </div>
+          )}
+
+          {customModelStats?.dimensions && (
+            <div className="text-slate-300 flex justify-between gap-2">
+              <span className="text-slate-400">Dimensions:</span>
+              <span className="text-slate-200">
+                {customModelStats.dimensions.width}m x {customModelStats.dimensions.height}m x {customModelStats.dimensions.length}m
+              </span>
+            </div>
+          )}
+
+          <div className="flex items-center justify-between pt-1 border-t border-slate-800/80 mt-0.5">
+            <button
+              type="button"
+              onClick={(e) => {
+                e.stopPropagation();
+                setIsDiagnosticsOpen(true);
+              }}
+              className="px-2 py-0.5 rounded bg-cyan-950/90 border border-cyan-400/50 text-cyan-300 text-[10px] font-bold hover:bg-cyan-900 flex items-center gap-1 cursor-pointer transition-colors shadow-sm"
+              title="Open Section 28 Developer Diagnostics Panel"
+            >
+              <Activity size={10} className="text-cyan-400" /> Diagnostics Panel
+            </button>
+            <button
+              type="button"
+              onClick={(e) => {
+                e.stopPropagation();
+                setCustomModel(null, null, null);
+                setBuildingMode('reconstructed');
+                setNotification('Switched back to Demo Digital Twin');
+              }}
+              className="text-[10px] text-slate-400 hover:text-cyan-300 underline cursor-pointer"
+            >
+              Switch to Demo
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* 8. PHASE 6: VIDEO UPLOAD & RECONSTRUCTION MODAL */}
       <VideoUploadModal />
+
+      {/* 9. SECTION 28 & 29: DEVELOPER DIAGNOSTICS PANEL & DEBUG TOGGLES */}
+      <DiagnosticsPanel isOpen={isDiagnosticsOpen} onClose={() => setIsDiagnosticsOpen(false)} />
     </div>
   );
 };

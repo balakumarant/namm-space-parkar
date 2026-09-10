@@ -9,6 +9,16 @@ const initialSpawn = initialMode === 'reconstructed'
   ? BUILDING_CONFIG.reconstructedSpawn 
   : BUILDING_CONFIG.proceduralSpawn;
 
+export interface CustomModelStats {
+  jobId: string;
+  filename?: string;
+  vertices?: number;
+  faces?: number;
+  dimensions?: { width: number; height: number; length: number };
+  status?: string;
+  diagnostics?: any;
+}
+
 interface GameState {
   hasStarted: boolean;
   currentFloor: number;
@@ -24,6 +34,7 @@ interface GameState {
   customModelJobId: string | null;
   customGlbUrl: string | null;
   customMetadataUrl: string | null;
+  customModelStats: CustomModelStats | null;
 
   // Navigation state
   availableRoutes: RouteOption[];
@@ -40,7 +51,12 @@ interface GameState {
   startGame: () => void;
   setBuildingMode: (mode: BuildingMode) => void;
   setUploadModalOpen: (open: boolean) => void;
-  setCustomModel: (jobId: string | null, glbUrl: string | null, metadataUrl: string | null) => void;
+  setCustomModel: (
+    jobId: string | null,
+    glbUrl: string | null,
+    metadataUrl: string | null,
+    stats?: CustomModelStats | null
+  ) => void;
   setPlayerMove: (pos: Vector3Tuple, floor: number) => void;
   setFloor: (floor: number) => void;
   setInteractionPrompt: (prompt: string | null) => void;
@@ -75,6 +91,7 @@ export const useGameStore = create<GameState>((set) => ({
   customModelJobId: null,
   customGlbUrl: null,
   customMetadataUrl: null,
+  customModelStats: null,
 
   availableRoutes: [],
   activeRoute: null,
@@ -90,11 +107,12 @@ export const useGameStore = create<GameState>((set) => ({
   startGame: () => set({ hasStarted: true }),
   setBuildingMode: (mode) => set({ buildingMode: mode }),
   setUploadModalOpen: (open) => set({ isUploadModalOpen: open }),
-  setCustomModel: (jobId, glbUrl, metadataUrl) =>
+  setCustomModel: (jobId, glbUrl, metadataUrl, stats = null) =>
     set({
       customModelJobId: jobId,
       customGlbUrl: glbUrl,
       customMetadataUrl: metadataUrl,
+      customModelStats: stats,
       buildingMode: 'reconstructed',
     }),
 

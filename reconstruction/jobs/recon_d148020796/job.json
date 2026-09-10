@@ -1,0 +1,38 @@
+{
+  "job_id": "recon_d148020796",
+  "filename": "black_video_short.mp4",
+  "file_size_bytes": 4743,
+  "created_at": 1789032811.713928,
+  "updated_at": 1789032811.7579198,
+  "status": "FAILED",
+  "progress_pct": 15,
+  "stage_description": "Pipeline failed: Too few sharp frames extracted (0). Walkthrough video is unsuitable for 3D reconstruction.",
+  "stages": {
+    "upload": {
+      "status": "COMPLETED",
+      "progress": 100
+    },
+    "extraction": {
+      "status": "IN_PROGRESS",
+      "progress": 20
+    },
+    "feature_matching": {
+      "status": "PENDING",
+      "progress": 0
+    },
+    "reconstruction": {
+      "status": "PENDING",
+      "progress": 0
+    },
+    "mesh_generation": {
+      "status": "PENDING",
+      "progress": 0
+    },
+    "validation": {
+      "status": "PENDING",
+      "progress": 0
+    }
+  },
+  "error": "Too few sharp frames extracted (0). Walkthrough video is unsuitable for 3D reconstruction.",
+  "result": null
+}

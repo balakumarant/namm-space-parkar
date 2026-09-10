@@ -1,0 +1,38 @@
+{
+  "job_id": "recon_a440ba40ff",
+  "filename": "Screen Recording 2026-09-09 134732.mp4",
+  "file_size_bytes": 24959332,
+  "created_at": 1789037234.9868727,
+  "updated_at": 1789037284.9627287,
+  "status": "FAILED",
+  "progress_pct": 75,
+  "stage_description": "Pipeline failed: Reconstruction subprocess failed with exit code 1: [ERROR] Architectural reconstruction failed: Mesh Quality Validation Failed: has_nan=False, max_edge=2.36m, largest_comp=100.0%\nTraceback (most recent call last):\n  File \"C:\\Users\\LENOVO\\Downloads\\namma-space-parkar\\reconstruction\\scripts\\reconstruct_architectural.py\", line 789, in main\n    reconstruct_architectural_twin(\n    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^\n        frames_dir=args.frames_dir,\n        ^^^^^^^^^^^^^^^^^^^^^^^^^^^\n    ...<4 lines>...\n        job_dir=args.job_dir\n        ^^^^^^^^^^^^^^^^^^^^\n    )\n    ^\n  File \"C:\\Users\\LENOVO\\Downloads\\namma-space-parkar\\reconstruction\\scripts\\reconstruct_architectural.py\", line 574, in reconstruct_architectural_twin\n    raise ValueError(f\"Mesh Quality Validation Failed: has_nan={has_nan}, max_edge={max_edge:.2f}m, largest_comp={largest_comp_pct:.1f}%\")\nValueError: Mesh Quality Validation Failed: has_nan=False, max_edge=2.36m, largest_comp=100.0%",
+  "stages": {
+    "upload": {
+      "status": "COMPLETED",
+      "progress": 100
+    },
+    "extraction": {
+      "status": "IN_PROGRESS",
+      "progress": 20
+    },
+    "feature_matching": {
+      "status": "IN_PROGRESS",
+      "progress": 40
+    },
+    "reconstruction": {
+      "status": "IN_PROGRESS",
+      "progress": 60
+    },
+    "mesh_generation": {
+      "status": "IN_PROGRESS",
+      "progress": 80
+    },
+    "validation": {
+      "status": "PENDING",
+      "progress": 0
+    }
+  },
+  "error": "Reconstruction subprocess failed with exit code 1: [ERROR] Architectural reconstruction failed: Mesh Quality Validation Failed: has_nan=False, max_edge=2.36m, largest_comp=100.0%\nTraceback (most recent call last):\n  File \"C:\\Users\\LENOVO\\Downloads\\namma-space-parkar\\reconstruction\\scripts\\reconstruct_architectural.py\", line 789, in main\n    reconstruct_architectural_twin(\n    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^\n        frames_dir=args.frames_dir,\n        ^^^^^^^^^^^^^^^^^^^^^^^^^^^\n    ...<4 lines>...\n        job_dir=args.job_dir\n        ^^^^^^^^^^^^^^^^^^^^\n    )\n    ^\n  File \"C:\\Users\\LENOVO\\Downloads\\namma-space-parkar\\reconstruction\\scripts\\reconstruct_architectural.py\", line 574, in reconstruct_architectural_twin\n    raise ValueError(f\"Mesh Quality Validation Failed: has_nan={has_nan}, max_edge={max_edge:.2f}m, largest_comp={largest_comp_pct:.1f}%\")\nValueError: Mesh Quality Validation Failed: has_nan=False, max_edge=2.36m, largest_comp=100.0%",
+  "result": null
+}

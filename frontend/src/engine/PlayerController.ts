@@ -196,8 +196,8 @@ export class PlayerController {
     }
     this.verticalVelocity = 0;
     this.isGrounded = true;
-    this.camera.position.set(this.spawnPosition.x, this.spawnPosition.y + this.eyeHeight, this.spawnPosition.z);
-    this.avatarMesh.position.set(this.spawnPosition.x, this.spawnPosition.y, this.spawnPosition.z);
+    this.camera.position.set(this.spawnPosition.x, this.spawnPosition.y + this.eyeHeight - 0.75, this.spawnPosition.z);
+    this.avatarMesh.position.set(this.spawnPosition.x, this.spawnPosition.y - 0.75, this.spawnPosition.z);
   }
 
   private triggerInteraction(): void {

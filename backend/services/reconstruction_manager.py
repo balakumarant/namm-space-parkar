@@ -14,6 +14,7 @@ import uuid
 import shutil
 import asyncio
 import logging
+import subprocess
 import trimesh
 import cv2
 import numpy as np
@@ -93,13 +94,12 @@ class ReconstructionJobManager:
 
         job_id = f"recon_{uuid.uuid4().hex[:10]}"
         job_dir = RECON_JOBS_DIR / job_id
-        input_dir = job_dir / "input"
-        frames_dir = job_dir / "frames"
-        output_dir = job_dir / "output"
 
-        os.makedirs(input_dir, exist_ok=True)
-        os.makedirs(frames_dir, exist_ok=True)
-        os.makedirs(output_dir, exist_ok=True)
+        # Isolated directory structure:
+        # job_dir / input, frames, features, poses, depth, points, planes, mesh, output
+        subfolders = ["input", "frames", "features", "poses", "depth", "points", "planes", "mesh", "output"]
+        for sf in subfolders:
+            os.makedirs(job_dir / sf, exist_ok=True)
 
         job = {
             "job_id": job_id,
@@ -356,16 +356,23 @@ class ReconstructionJobManager:
                 "Synthesizing watertight architectural geometry & exporting game-ready GLB..."
             )
 
-            # Import the architecture-aware reconstruction engine
-            from reconstruct_architectural import reconstruct_architectural_twin
-
-            recon_res = reconstruct_architectural_twin(
-                frames_dir=str(frames_dir),
-                output_dir=str(output_dir),
-                max_sift_features=2500,
-                job_id=job_id,
-                original_filename=job.get("filename", "walkthrough.mp4")
-            )
+            # Execute the architecture-aware reconstruction engine via isolated subprocess
+            script_path = SCRIPTS_DIR / "reconstruct_architectural.py"
+            cmd = [
+                sys.executable,
+                str(script_path),
+                "--frames-dir", str(frames_dir),
+                "--output-dir", str(output_dir),
+                "--job-id", job_id,
+                "--filename", str(job.get("filename", "walkthrough.mp4")),
+                "--job-dir", str(job_dir),
+                "--max-features", "2500"
+            ]
+            logger.info(f"[Job {job_id}] Invoking reconstruction subprocess: {' '.join(cmd)}")
+            proc = subprocess.run(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True, check=False)
+            if proc.returncode != 0:
+                err_text = proc.stderr.strip() or proc.stdout.strip()
+                raise RuntimeError(f"Reconstruction subprocess failed with exit code {proc.returncode}: {err_text}")
 
             # 4. Validating Generated Model
             self._update_stage(
@@ -385,6 +392,16 @@ class ReconstructionJobManager:
             if not meta_path.exists():
                 self._generate_metadata_json(job_id, val_stats, output_dir)
 
+            # Read diagnostics.json to attach detailed metrics to result
+            diag_path = output_dir / "diagnostics.json"
+            diag_stats = {}
+            if diag_path.exists():
+                try:
+                    with open(diag_path, "r", encoding="utf-8") as f:
+                        diag_stats = json.load(f)
+                except Exception as e:
+                    logger.warning(f"Failed to read diagnostics {diag_path}: {e}")
+
             # Mark Completed
             job = self.jobs[job_id]
             job["status"] = STATE_COMPLETED
@@ -400,7 +417,8 @@ class ReconstructionJobManager:
                 "metadata_url": f"/api/reconstruction/model/{job_id}/metadata.json",
                 "diagnostics_url": f"/api/reconstruction/diagnostics/{job_id}",
                 "mesh_stats": val_stats,
-                "extracted_frames": saved_frames
+                "extracted_frames": saved_frames,
+                "diagnostics": diag_stats
             }
 
             self._save_job_state(job_id)

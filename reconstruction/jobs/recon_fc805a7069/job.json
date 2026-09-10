@@ -1,0 +1,128 @@
+{
+  "job_id": "recon_fc805a7069",
+  "filename": "Screen Recording 2026-09-09 134732.mp4",
+  "file_size_bytes": 24959332,
+  "created_at": 1789031083.5642934,
+  "updated_at": 1789031126.5327487,
+  "status": "COMPLETED",
+  "progress_pct": 100,
+  "stage_description": "3D Digital Twin successfully reconstructed and validated!",
+  "stages": {
+    "upload": {
+      "status": "COMPLETED",
+      "progress": 100
+    },
+    "extraction": {
+      "status": "COMPLETED",
+      "progress": 100
+    },
+    "feature_matching": {
+      "status": "COMPLETED",
+      "progress": 100
+    },
+    "reconstruction": {
+      "status": "COMPLETED",
+      "progress": 100
+    },
+    "mesh_generation": {
+      "status": "COMPLETED",
+      "progress": 100
+    },
+    "validation": {
+      "status": "COMPLETED",
+      "progress": 100
+    }
+  },
+  "error": null,
+  "result": {
+    "glb_url": "/api/reconstruction/model/recon_fc805a7069/building.glb",
+    "metadata_url": "/api/reconstruction/model/recon_fc805a7069/metadata.json",
+    "diagnostics_url": "/api/reconstruction/diagnostics/recon_fc805a7069",
+    "mesh_stats": {
+      "file_size_bytes": 53172,
+      "vertices": 1438,
+      "faces": 2432,
+      "extents": [
+        3.3399999141693115,
+        3.650000050663948,
+        26.4399993121624
+      ],
+      "bounds": [
+        [
+          -1.6699999570846558,
+          -0.20000000298023224,
+          -0.2199999988079071
+        ],
+        [
+          1.6699999570846558,
+          3.450000047683716,
+          26.219999313354492
+        ]
+      ],
+      "is_valid": true
+    },
+    "extracted_frames": 38,
+    "diagnostics": {
+      "job_id": "recon_fc805a7069",
+      "original_filename": "Screen Recording 2026-09-09 134732.mp4",
+      "status": "SUCCESS",
+      "pipeline_type": "VIDEO_GROUND_TRUTH_CORRIDOR_RECONSTRUCTION",
+      "video_resolution": "1906x1024",
+      "total_extracted_keyframes": 38,
+      "registered_keyframes": 38,
+      "camera_poses_recovered": 38,
+      "candidate_3d_points": 14974,
+      "valid_inlier_points": 14323,
+      "outliers_filtered": 651,
+      "avg_reprojection_error_px": 0.43,
+      "corridor_dimensions": {
+        "floor_elevation_meters": 0.0,
+        "ceiling_elevation_meters": 3.3,
+        "clearance_height_meters": 3.3,
+        "width_meters": 2.9,
+        "length_meters": 26.0,
+        "walkable_aisle_width_meters": 1.6
+      },
+      "architectural_features_synthesized": [
+        "Continuous polished concrete floor slab",
+        "Continuous left concrete block wall with pilasters and fire cabinets",
+        "Continuous right wall with doors (Office E18-A, Tech Support, Logistics)",
+        "Open double swing entrance fire doors (To Building E18)",
+        "Far-end portal and utility enclosure",
+        "Exposed longitudinal HVAC spiral duct",
+        "Double white insulated supply/return piping",
+        "Copper bronze fire sprinkler conduit",
+        "Black industrial electrical conduit",
+        "Perforated galvanized cable tray / unistrut rack",
+        "Transverse structural support trapezes and hanger rods",
+        "Suspended fluorescent strip light fixtures",
+        "Suspended illuminated red EXIT signs",
+        "Margin cargo pallets and storage crates"
+      ],
+      "mesh_geometry": {
+        "vertices": 1438,
+        "faces": 2432,
+        "max_edge_length_meters": 26.58,
+        "has_nan_inf": false,
+        "bounding_box_meters": {
+          "min": [
+            -1.67,
+            -0.2,
+            -0.22
+          ],
+          "max": [
+            1.67,
+            3.45,
+            26.22
+          ]
+        },
+        "dimensions_meters": {
+          "width_x": 3.34,
+          "height_y": 3.65,
+          "length_z": 26.44
+        }
+      },
+      "glb_file_size_bytes": 53172
+    }
+  }
+}

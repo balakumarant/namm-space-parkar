@@ -1,0 +1,6 @@
+{
+  "min_depth_m": 0.4,
+  "max_depth_m": 35.0,
+  "estimated_camera_height_m": 1.55,
+  "focal_length_px": 736.0
+}

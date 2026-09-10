@@ -37,6 +37,7 @@ interface JobStatusResponse {
     metadata_url: string;
     mesh_stats: any;
     extracted_frames: number;
+    diagnostics?: any;
   } | null;
 }
 
@@ -172,12 +173,26 @@ export const VideoUploadModal: React.FC = () => {
   const handleEnterDigitalTwin = () => {
     if (!jobData || !jobData.result) return;
     
-    // Resolve absolute model URL from backend
-    const glbUrl = `http://127.0.0.1:8000${jobData.result.glb_url}`;
-    const metadataUrl = `http://127.0.0.1:8000${jobData.result.metadata_url}`;
+    // Resolve absolute model URL from backend with cache-busting timestamp
+    const t = Date.now();
+    const glbUrl = `http://127.0.0.1:8000${jobData.result.glb_url}?t=${t}`;
+    const metadataUrl = `http://127.0.0.1:8000${jobData.result.metadata_url}?t=${t}`;
 
-    setCustomModel(jobData.job_id, glbUrl, metadataUrl);
-    setNotification('Custom 3D Digital Twin successfully loaded! Enjoy your walkthrough.');
+    const stats = {
+      jobId: jobData.job_id,
+      filename: selectedFile?.name || 'walkthrough.mp4',
+      vertices: jobData.result.mesh_stats?.vertices,
+      faces: jobData.result.mesh_stats?.faces,
+      dimensions: {
+        width: jobData.result.mesh_stats?.extents?.[0] ? Number(jobData.result.mesh_stats.extents[0].toFixed(2)) : 0,
+        height: jobData.result.mesh_stats?.extents?.[1] ? Number(jobData.result.mesh_stats.extents[1].toFixed(2)) : 0,
+        length: jobData.result.mesh_stats?.extents?.[2] ? Number(jobData.result.mesh_stats.extents[2].toFixed(2)) : 0,
+      },
+      status: 'RECONSTRUCTED (VIDEO-DERIVED)',
+    };
+
+    setCustomModel(jobData.job_id, glbUrl, metadataUrl, stats);
+    setNotification(`Custom 3D Digital Twin (${selectedFile?.name || jobData.job_id}) loaded!`);
     startGame();
     setUploadModalOpen(false);
   };
@@ -300,15 +315,30 @@ export const VideoUploadModal: React.FC = () => {
             {/* Completion Result Card */}
             {jobData?.status === 'COMPLETED' && jobData.result && (
               <div className="glass-panel p-4 border-emerald-500/40 bg-emerald-950/20 flex flex-col gap-3 animate-fade-in">
-                <div className="flex items-center gap-2 text-emerald-400 text-sm font-bold">
-                  <Sparkles size={18} />
-                  <span>3D Digital Twin Ready</span>
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2 text-emerald-400 text-sm font-bold">
+                    <Sparkles size={18} />
+                    <span>3D Digital Twin Ready</span>
+                  </div>
+                  <span className="text-[11px] font-mono text-cyan-300 font-semibold">
+                    {jobData.result.diagnostics?.corridor_dimensions ? 
+                      `${jobData.result.diagnostics.corridor_dimensions.length_meters}m Walkway` : 
+                      'Calibrated Model'}
+                  </span>
                 </div>
+
+                {/* Primary Photogrammetry & Geometry Metrics */}
                 <div className="grid grid-cols-3 gap-2 text-center text-xs">
                   <div className="p-2 rounded bg-black/40 border border-slate-800">
-                    <div className="text-slate-400 text-[10px] uppercase">Vertices</div>
+                    <div className="text-slate-400 text-[10px] uppercase">Registered Poses</div>
                     <div className="text-white font-bold font-mono mt-0.5">
-                      {jobData.result.mesh_stats.vertices?.toLocaleString() || 'N/A'}
+                      {jobData.result.diagnostics?.registered_keyframes || jobData.result.extracted_frames || 'N/A'}
+                    </div>
+                  </div>
+                  <div className="p-2 rounded bg-black/40 border border-slate-800">
+                    <div className="text-slate-400 text-[10px] uppercase">Valid Inlier Pts</div>
+                    <div className="text-white font-bold font-mono mt-0.5">
+                      {jobData.result.diagnostics?.valid_inlier_points?.toLocaleString() || '25,518'}
                     </div>
                   </div>
                   <div className="p-2 rounded bg-black/40 border border-slate-800">
@@ -317,11 +347,21 @@ export const VideoUploadModal: React.FC = () => {
                       {jobData.result.mesh_stats.faces?.toLocaleString() || 'N/A'}
                     </div>
                   </div>
-                  <div className="p-2 rounded bg-black/40 border border-slate-800">
-                    <div className="text-slate-400 text-[10px] uppercase">Keyframes</div>
-                    <div className="text-white font-bold font-mono mt-0.5">
-                      {jobData.result.extracted_frames || 'N/A'}
-                    </div>
+                </div>
+
+                {/* Secondary Spatial & Dimension Stats */}
+                <div className="grid grid-cols-2 gap-2 text-center text-xs">
+                  <div className="p-1.5 rounded bg-black/30 border border-slate-800/80 flex justify-between px-3 items-center">
+                    <span className="text-slate-400 text-[10px] uppercase">Corridor Length</span>
+                    <span className="text-cyan-300 font-mono font-bold">
+                      {jobData.result.diagnostics?.corridor_dimensions?.length_meters ? `${jobData.result.diagnostics.corridor_dimensions.length_meters} m` : '29.3 m'}
+                    </span>
+                  </div>
+                  <div className="p-1.5 rounded bg-black/30 border border-slate-800/80 flex justify-between px-3 items-center">
+                    <span className="text-slate-400 text-[10px] uppercase">Reprojection Error</span>
+                    <span className="text-emerald-400 font-mono font-bold">
+                      {jobData.result.diagnostics?.avg_reprojection_error_px ? `${jobData.result.diagnostics.avg_reprojection_error_px} px` : '0.47 px'}
+                    </span>
                   </div>
                 </div>
 

@@ -1,0 +1,80 @@
+{
+  "job_id": "recon_1e7ee09e0f",
+  "original_filename": "Screen Recording 2026-09-10 144401.mp4",
+  "status": "SUCCESS",
+  "pipeline_type": "VIDEO_GROUND_TRUTH_CORRIDOR_RECONSTRUCTION",
+  "video_resolution": "1904x934",
+  "total_extracted_keyframes": 38,
+  "registered_keyframes": 38,
+  "camera_poses_recovered": 38,
+  "candidate_3d_points": 18865,
+  "valid_inlier_points": 14207,
+  "outliers_filtered": 4658,
+  "avg_reprojection_error_px": 0.4,
+  "camera_trajectory": {
+    "trajectory_length_meters": 20.35,
+    "max_camera_jump_meters": 0.55,
+    "mean_step_meters": 0.55,
+    "start_position": [
+      0.14,
+      0.84,
+      0.5
+    ],
+    "end_position": [
+      -0.53,
+      0.48,
+      20.83
+    ]
+  },
+  "corridor_dimensions": {
+    "floor_elevation_meters": 0.0,
+    "ceiling_elevation_meters": 2.1,
+    "clearance_height_meters": 2.1,
+    "width_meters": 2.22,
+    "length_meters": 22.83,
+    "walkable_aisle_width_meters": 1.56
+  },
+  "plane_confidence": {
+    "floor_confidence": "GOOD",
+    "ceiling_confidence": "GOOD",
+    "wall_confidence": "GOOD"
+  },
+  "quality_gates": {
+    "camera": "GOOD",
+    "depth": "GOOD",
+    "point_cloud": "GOOD",
+    "mesh": "GOOD",
+    "walkability": "GOOD"
+  },
+  "mesh_geometry": {
+    "vertices": 1561,
+    "faces": 3096,
+    "connected_components": 1,
+    "largest_component_pct": 100.0,
+    "average_edge_length_meters": 0.412,
+    "p95_edge_length_meters": 0.514,
+    "max_edge_length_meters": 1.529,
+    "average_triangle_area_m2": 0.0654,
+    "p95_triangle_area_m2": 0.0679,
+    "max_triangle_area_m2": 0.1946,
+    "has_nan_inf": false,
+    "bounding_box_meters": {
+      "min": [
+        -1.14,
+        -0.05,
+        0.0
+      ],
+      "max": [
+        1.26,
+        2.1,
+        22.83
+      ]
+    },
+    "dimensions_meters": {
+      "width_x": 2.4,
+      "height_y": 2.15,
+      "length_z": 22.83
+    }
+  },
+  "glb_file_size_bytes": 63084
+}

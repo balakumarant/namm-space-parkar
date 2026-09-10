@@ -1,0 +1,129 @@
+{
+  "building_name": "User Digital Twin (recon_eebb61f611)",
+  "format": "GLB / glTF 2.0 Binary",
+  "pipeline_version": "v6.0-Ground-Truth-Manifold-SfM",
+  "units": "meters",
+  "original_filename": "Screen Recording 2026-09-10 004816.mp4",
+  "scale_calibrated": true,
+  "scale_factor": 1.0,
+  "dimensions": {
+    "width_meters": 1.8,
+    "height_meters": 2.1,
+    "length_meters": 22.68
+  },
+  "bounds": {
+    "min": [
+      -0.9,
+      0.0,
+      0.0
+    ],
+    "max": [
+      0.9,
+      2.1,
+      22.68
+    ]
+  },
+  "mesh_stats": {
+    "vertices": 1562,
+    "faces": 3120,
+    "file_size_bytes": 63376
+  },
+  "floors": [
+    {
+      "floor": 1,
+      "elevation_meters": 0.0,
+      "height_meters": 2.1,
+      "walkable_surface": {
+        "min_x": -0.9,
+        "max_x": 0.9,
+        "min_z": 0.0,
+        "max_z": 22.68
+      }
+    }
+  ],
+  "rooms": [
+    {
+      "id": "recon_eebb61f611_entrance",
+      "name": "Entrance (Screen Recording 2026-09-10 004816.mp4)",
+      "floor": 1,
+      "center": [
+        0.0,
+        0.0,
+        1.8
+      ],
+      "door": [
+        0.0,
+        0.0,
+        0.5
+      ]
+    },
+    {
+      "id": "recon_eebb61f611_midway",
+      "name": "Corridor Walkway",
+      "floor": 1,
+      "center": [
+        0.0,
+        0.0,
+        11.34
+      ],
+      "door": [
+        0.0,
+        0.0,
+        10.34
+      ]
+    },
+    {
+      "id": "recon_eebb61f611_terminal",
+      "name": "Terminal End",
+      "floor": 1,
+      "center": [
+        0.0,
+        0.0,
+        20.88
+      ],
+      "door": [
+        0.0,
+        0.0,
+        20.18
+      ]
+    }
+  ],
+  "pois": [
+    {
+      "id": "poi_recon_eebb61f611_entry",
+      "name": "Walkthrough Entrance",
+      "floor": 1,
+      "category": "entrance",
+      "position": {
+        "x": 0.0,
+        "y": 0.0,
+        "z": 1.8
+      },
+      "description": "Spawn point in reconstructed walkthrough of Screen Recording 2026-09-10 004816.mp4"
+    },
+    {
+      "id": "poi_recon_eebb61f611_midway",
+      "name": "Central Corridor Waypoint",
+      "floor": 1,
+      "category": "waypoint",
+      "position": {
+        "x": 0.0,
+        "y": 0.0,
+        "z": 11.34
+      },
+      "description": "Midpoint along the reconstructed walkway"
+    },
+    {
+      "id": "poi_recon_eebb61f611_terminal",
+      "name": "Terminal Observation Zone",
+      "floor": 1,
+      "category": "viewpoint",
+      "position": {
+        "x": 0.0,
+        "y": 0.0,
+        "z": 20.88
+      },
+      "description": "Far-end termination of the reconstructed hallway"
+    }
+  ]
+}

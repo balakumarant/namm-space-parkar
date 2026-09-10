@@ -1,0 +1,53 @@
+{
+  "job_id": "job_test_b",
+  "original_filename": "indoor_building.mp4",
+  "status": "SUCCESS",
+  "pipeline_type": "VIDEO_GROUND_TRUTH_CORRIDOR_RECONSTRUCTION",
+  "video_resolution": "1280x720",
+  "total_extracted_keyframes": 10,
+  "registered_keyframes": 10,
+  "camera_poses_recovered": 10,
+  "candidate_3d_points": 675,
+  "valid_inlier_points": 642,
+  "outliers_filtered": 33,
+  "avg_reprojection_error_px": 0.19,
+  "corridor_dimensions": {
+    "floor_elevation_meters": -0.79,
+    "ceiling_elevation_meters": 1.71,
+    "clearance_height_meters": 2.5,
+    "width_meters": 16.0,
+    "length_meters": 26.64,
+    "walkable_aisle_width_meters": 1.6
+  },
+  "architectural_features_synthesized": [
+    "Continuous photogrammetric floor slab with sampled video color",
+    "Continuous boundary perimeter walls with sampled video colors",
+    "Ceiling slab enclosure",
+    "Direct 2.5D Delaunay surface meshing from multi-view point cloud",
+    "Entrance portal enclosure"
+  ],
+  "mesh_geometry": {
+    "vertices": 229,
+    "faces": 233,
+    "max_edge_length_meters": 31.62,
+    "has_nan_inf": false,
+    "bounding_box_meters": {
+      "min": [
+        -19.85,
+        -0.99,
+        -0.7
+      ],
+      "max": [
+        -0.49,
+        1.86,
+        26.34
+      ]
+    },
+    "dimensions_meters": {
+      "width_x": 19.36,
+      "height_y": 2.85,
+      "length_z": 27.04
+    }
+  },
+  "glb_file_size_bytes": 7428
+}

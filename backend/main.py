@@ -246,7 +246,11 @@ def serve_reconstructed_glb(job_id: str):
         path=str(glb_file),
         media_type="model/gltf-binary",
         filename=f"building_{job_id}.glb",
-        headers={"Cache-Control": "public, max-age=3600"}
+        headers={
+            "Cache-Control": "no-cache, no-store, must-revalidate",
+            "Pragma": "no-cache",
+            "Expires": "0"
+        }
     )
 
 @app.get("/api/reconstruction/model/{job_id}/metadata.json")
@@ -262,7 +266,12 @@ def serve_reconstructed_metadata(job_id: str):
     return FileResponse(
         path=str(meta_file),
         media_type="application/json",
-        filename="metadata.json"
+        filename="metadata.json",
+        headers={
+            "Cache-Control": "no-cache, no-store, must-revalidate",
+            "Pragma": "no-cache",
+            "Expires": "0"
+        }
     )
 
 @app.get("/api/reconstruction/diagnostics/{job_id}")
@@ -278,7 +287,12 @@ def serve_reconstructed_diagnostics(job_id: str):
     return FileResponse(
         path=str(diag_file),
         media_type="application/json",
-        filename=f"diagnostics_{job_id}.json"
+        filename=f"diagnostics_{job_id}.json",
+        headers={
+            "Cache-Control": "no-cache, no-store, must-revalidate",
+            "Pragma": "no-cache",
+            "Expires": "0"
+        }
     )
 
 if __name__ == "__main__":

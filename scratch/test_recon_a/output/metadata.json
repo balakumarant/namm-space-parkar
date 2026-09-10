@@ -1,0 +1,129 @@
+{
+  "building_name": "User Digital Twin (job_test_a)",
+  "format": "GLB / glTF 2.0 Binary",
+  "pipeline_version": "v5C.3-Video-Ground-Truth-Corridor",
+  "units": "meters",
+  "original_filename": "test_corridor_walkthrough.mp4",
+  "scale_calibrated": true,
+  "scale_factor": 1.0,
+  "dimensions": {
+    "width_meters": 9.91,
+    "height_meters": 5.69,
+    "length_meters": 19.98
+  },
+  "bounds": {
+    "min": [
+      -7.82,
+      -0.97,
+      -0.7
+    ],
+    "max": [
+      2.09,
+      4.72,
+      19.28
+    ]
+  },
+  "mesh_stats": {
+    "vertices": 204,
+    "faces": 272,
+    "file_size_bytes": 7492
+  },
+  "floors": [
+    {
+      "floor": 1,
+      "elevation_meters": -0.77,
+      "height_meters": 5.0,
+      "walkable_surface": {
+        "min_x": -7.53,
+        "max_x": 1.89,
+        "min_z": -0.5,
+        "max_z": 19.08
+      }
+    }
+  ],
+  "rooms": [
+    {
+      "id": "job_test_a_entrance",
+      "name": "Entrance Zone (test_corridor_walkthrough.mp4)",
+      "floor": 1,
+      "center": [
+        -2.82,
+        -0.77,
+        1.0
+      ],
+      "door": [
+        -2.82,
+        -0.77,
+        0.0
+      ]
+    },
+    {
+      "id": "job_test_a_midway",
+      "name": "Midway Walkway Zone",
+      "floor": 1,
+      "center": [
+        -2.82,
+        -0.77,
+        9.29
+      ],
+      "door": [
+        -2.82,
+        -0.77,
+        8.29
+      ]
+    },
+    {
+      "id": "job_test_a_terminal",
+      "name": "Terminal Area",
+      "floor": 1,
+      "center": [
+        -2.82,
+        -0.77,
+        17.58
+      ],
+      "door": [
+        -2.82,
+        -0.77,
+        16.58
+      ]
+    }
+  ],
+  "pois": [
+    {
+      "id": "poi_job_test_a_entry",
+      "name": "Walkthrough Entrance (test_corridor_walkthrough.mp4)",
+      "floor": 1,
+      "category": "entrance",
+      "position": {
+        "x": -2.82,
+        "y": -0.77,
+        "z": 1.0
+      },
+      "description": "Starting position for walkthrough of test_corridor_walkthrough.mp4"
+    },
+    {
+      "id": "poi_job_test_a_midway",
+      "name": "Midway Walkway Zone",
+      "floor": 1,
+      "category": "waypoint",
+      "position": {
+        "x": -2.82,
+        "y": -0.77,
+        "z": 9.29
+      },
+      "description": "Central sector of the reconstructed environment"
+    },
+    {
+      "id": "poi_job_test_a_terminal",
+      "name": "Terminal Observation Zone",
+      "floor": 1,
+      "category": "viewpoint",
+      "position": {
+        "x": -2.82,
+        "y": -0.77,
+        "z": 17.58
+      },
+      "description": "Far-end termination of the reconstructed walkthrough"
+    }
+  ]
+}

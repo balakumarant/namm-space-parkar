@@ -1,0 +1,183 @@
+{
+  "building_name": "User Digital Twin (recon_0ed1c302f6)",
+  "format": "GLB / glTF 2.0 Binary",
+  "pipeline_version": "v5C.3-Video-Ground-Truth-Corridor",
+  "units": "meters",
+  "original_filename": "test_corridor_walkthrough.mp4",
+  "scale_calibrated": true,
+  "scale_factor": 1.0,
+  "dimensions": {
+    "width_meters": 3.6,
+    "height_meters": 3.65,
+    "length_meters": 26.44
+  },
+  "bounds": {
+    "min": [
+      -1.67,
+      -0.2,
+      -0.22
+    ],
+    "max": [
+      1.93,
+      3.45,
+      26.22
+    ]
+  },
+  "mesh_stats": {
+    "vertices": 1550,
+    "faces": 2600,
+    "file_size_bytes": 56976
+  },
+  "floors": [
+    {
+      "floor": 1,
+      "elevation_meters": 0.0,
+      "height_meters": 3.3,
+      "walkable_surface": {
+        "min_x": -1.45,
+        "max_x": 1.45,
+        "min_z": 0.0,
+        "max_z": 26.0
+      }
+    }
+  ],
+  "rooms": [
+    {
+      "id": "recon_0ed1c302f6_entrance",
+      "name": "Entrance Portal (Building E18)",
+      "floor": 1,
+      "center": [
+        0.0,
+        0.0,
+        1.5
+      ],
+      "door": [
+        0.0,
+        0.0,
+        0.5
+      ]
+    },
+    {
+      "id": "recon_0ed1c302f6_door1",
+      "name": "Right Door 1 - Office E18-A",
+      "floor": 1,
+      "center": [
+        1.45,
+        0.0,
+        5.2
+      ],
+      "door": [
+        1.25,
+        0.0,
+        5.2
+      ]
+    },
+    {
+      "id": "recon_0ed1c302f6_door2",
+      "name": "Right Door 2 - Tech Support Hub",
+      "floor": 1,
+      "center": [
+        1.45,
+        0.0,
+        13.5
+      ],
+      "door": [
+        1.25,
+        0.0,
+        13.5
+      ]
+    },
+    {
+      "id": "recon_0ed1c302f6_door3",
+      "name": "Right Door 3 - Logistics & Service",
+      "floor": 1,
+      "center": [
+        1.45,
+        0.0,
+        23.0
+      ],
+      "door": [
+        1.25,
+        0.0,
+        23.0
+      ]
+    },
+    {
+      "id": "recon_0ed1c302f6_vista",
+      "name": "Far End Corridor Vista",
+      "floor": 1,
+      "center": [
+        0.0,
+        0.0,
+        24.0
+      ],
+      "door": [
+        0.0,
+        0.0,
+        23.0
+      ]
+    }
+  ],
+  "pois": [
+    {
+      "id": "poi_recon_0ed1c302f6_entry",
+      "name": "Corridor Entrance Portal",
+      "floor": 1,
+      "category": "entrance",
+      "position": {
+        "x": 0.0,
+        "y": 0.0,
+        "z": 1.5
+      },
+      "description": "Spawn entrance portal into user reconstructed corridor"
+    },
+    {
+      "id": "poi_recon_0ed1c302f6_door1",
+      "name": "Office Door E18-A",
+      "floor": 1,
+      "category": "room",
+      "position": {
+        "x": 1.15,
+        "y": 0.0,
+        "z": 5.2
+      },
+      "description": "Office entrance on right wall"
+    },
+    {
+      "id": "poi_recon_0ed1c302f6_door2",
+      "name": "Tech Support Hub",
+      "floor": 1,
+      "category": "room",
+      "position": {
+        "x": 1.15,
+        "y": 0.0,
+        "z": 13.5
+      },
+      "description": "Central corridor utility hub"
+    },
+    {
+      "id": "poi_recon_0ed1c302f6_door3",
+      "name": "Logistics Service Door",
+      "floor": 1,
+      "category": "room",
+      "position": {
+        "x": 1.15,
+        "y": 0.0,
+        "z": 23.0
+      },
+      "description": "Heavy double service doors"
+    },
+    {
+      "id": "poi_recon_0ed1c302f6_vista",
+      "name": "Far End Corridor Vista",
+      "floor": 1,
+      "category": "viewpoint",
+      "position": {
+        "x": 0.0,
+        "y": 0.0,
+        "z": 24.0
+      },
+      "description": "Reconstructed corridor terminal vista"
+    }
+  ]
+}
